@@ -1,0 +1,3136 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>英语听写复习</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #17202a;
+      --muted: #617080;
+      --line: #d7dee7;
+      --panel: #ffffff;
+      --paper: #f5f7fb;
+      --accent: #256f79;
+      --accent-dark: #1d5961;
+      --good: #237a57;
+      --bad: #b2463a;
+      --warn: #9b650e;
+      --shadow: 0 12px 34px rgba(28, 44, 68, 0.12);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        linear-gradient(135deg, rgba(37, 111, 121, 0.10), transparent 34%),
+        linear-gradient(315deg, rgba(196, 92, 72, 0.10), transparent 38%),
+        var(--paper);
+      color: var(--ink);
+    }
+
+    button,
+    input,
+    textarea,
+    select {
+      font: inherit;
+    }
+
+    button {
+      border: 0;
+      cursor: pointer;
+    }
+
+    .shell {
+      width: min(1160px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 28px 0 36px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 18px;
+      margin-bottom: 20px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(28px, 4vw, 46px);
+      line-height: 1.02;
+      letter-spacing: 0;
+    }
+
+    .subtitle {
+      margin: 8px 0 0;
+      color: var(--muted);
+      max-width: 620px;
+      line-height: 1.55;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(78px, 1fr));
+      gap: 8px;
+      min-width: min(540px, 100%);
+    }
+
+    .stat {
+      background: rgba(255, 255, 255, 0.78);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 10px 12px;
+      box-shadow: 0 8px 22px rgba(28, 44, 68, 0.06);
+    }
+
+    .stat-action {
+      color: var(--ink);
+      text-align: left;
+      transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .stat-action:hover {
+      border-color: var(--accent);
+      box-shadow: 0 10px 24px rgba(31, 111, 124, 0.16);
+      transform: translateY(-1px);
+    }
+
+    .stat strong {
+      display: block;
+      font-size: 24px;
+      line-height: 1.1;
+    }
+
+    .stat span {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 390px;
+      gap: 18px;
+      align-items: start;
+    }
+
+    .panel {
+      background: rgba(255, 255, 255, 0.88);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+    }
+
+    .panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 16px 18px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .panel-header h2 {
+      margin: 0;
+      font-size: 18px;
+      letter-spacing: 0;
+    }
+
+    .panel-body {
+      padding: 18px;
+    }
+
+    .review-stage {
+      min-height: 520px;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      gap: 18px;
+    }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .round-control {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 42px;
+      padding: 0 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.78);
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .round-control input {
+      width: 72px;
+      min-height: 30px;
+      padding: 5px 8px;
+    }
+
+    .btn {
+      min-height: 42px;
+      border-radius: 8px;
+      padding: 0 14px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      color: var(--ink);
+      background: #e9eef4;
+      border: 1px solid #ccd6e1;
+      transition: transform 0.15s ease, background 0.15s ease;
+      white-space: nowrap;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+      background: #dfe7ef;
+    }
+
+    .btn.primary {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: white;
+    }
+
+    .btn.primary:hover {
+      background: var(--accent-dark);
+    }
+
+    .btn.danger {
+      background: #f5e8e5;
+      border-color: #e7c7c0;
+      color: var(--bad);
+    }
+
+    .icon {
+      width: 18px;
+      height: 18px;
+      display: inline-block;
+      flex: 0 0 auto;
+    }
+
+    .is-speaking {
+      border-color: var(--accent);
+      color: var(--accent-dark);
+      background: #e7f2f4;
+    }
+
+    .is-speaking .icon {
+      animation: soundPulse 0.8s ease-in-out infinite;
+    }
+
+    @keyframes soundPulse {
+      0%, 100% {
+        transform: scale(1);
+        opacity: 0.72;
+      }
+      50% {
+        transform: scale(1.18);
+        opacity: 1;
+      }
+    }
+
+    .prompt {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: linear-gradient(180deg, #ffffff, #f8fafc);
+      padding: 22px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 18px;
+      min-height: 260px;
+    }
+
+    .prompt.empty {
+      justify-content: center;
+      text-align: center;
+      color: var(--muted);
+    }
+
+    .prompt-label {
+      color: var(--muted);
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .prompt-head {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .answer-row {
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      gap: 10px;
+      align-items: start;
+    }
+
+    .input-wrap {
+      display: grid;
+      gap: 8px;
+    }
+
+    .field-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    textarea,
+    input,
+    select {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--ink);
+      padding: 11px 12px;
+      outline: none;
+    }
+
+    textarea:focus,
+    input:focus,
+    select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(37, 111, 121, 0.13);
+    }
+
+    textarea {
+      min-height: 112px;
+      resize: vertical;
+      line-height: 1.5;
+    }
+
+    .result {
+      min-height: 104px;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background: #fff;
+      padding: 14px;
+      line-height: 1.55;
+    }
+
+    .result.good {
+      border-color: rgba(35, 122, 87, 0.35);
+      background: rgba(35, 122, 87, 0.07);
+    }
+
+    .result.bad {
+      border-color: rgba(178, 70, 58, 0.35);
+      background: rgba(178, 70, 58, 0.07);
+    }
+
+    .diff span {
+      display: inline-block;
+      margin: 2px 3px 2px 0;
+      padding: 1px 5px;
+      border-radius: 5px;
+    }
+
+    .diff .match {
+      background: rgba(35, 122, 87, 0.12);
+    }
+
+    .diff .miss {
+      background: rgba(178, 70, 58, 0.14);
+      color: var(--bad);
+      text-decoration: line-through;
+    }
+
+    .diff .extra {
+      background: rgba(155, 101, 14, 0.14);
+      color: var(--warn);
+    }
+
+    .form-grid {
+      display: grid;
+      gap: 12px;
+    }
+
+    label {
+      display: grid;
+      gap: 7px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    label span {
+      color: var(--ink);
+      font-weight: 650;
+      font-size: 14px;
+    }
+
+    .hint,
+    .notice {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .notice.error {
+      color: var(--bad);
+      font-weight: 650;
+    }
+
+    .notice.ok {
+      color: var(--good);
+      font-weight: 650;
+    }
+
+    .settings {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .list {
+      display: grid;
+      gap: 9px;
+      max-height: 330px;
+      overflow: auto;
+      padding-right: 2px;
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      padding: 12px;
+      display: grid;
+      gap: 8px;
+    }
+
+    .card-title {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: start;
+      font-weight: 750;
+    }
+
+    .card-stats {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 2px;
+      white-space: nowrap;
+      line-height: 1.25;
+    }
+
+    .card-footer {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .entry-date {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.2;
+      white-space: nowrap;
+    }
+
+    .card p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.45;
+      font-size: 13px;
+    }
+
+    .mini-actions {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .mini {
+      min-height: 30px;
+      padding: 0 9px;
+      border-radius: 7px;
+      background: #eef3f8;
+      border: 1px solid #d5dee8;
+      color: var(--ink);
+      font-size: 12px;
+    }
+
+    .tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      padding: 4px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #eef3f8;
+    }
+
+    .tab {
+      min-height: 34px;
+      border-radius: 6px;
+      background: transparent;
+      color: var(--muted);
+      font-weight: 650;
+    }
+
+    .tab.active {
+      background: #fff;
+      color: var(--ink);
+      box-shadow: 0 4px 12px rgba(28, 44, 68, 0.09);
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .file-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .library-search {
+      display: grid;
+      gap: 8px;
+    }
+
+    .library-search input {
+      width: 100%;
+      min-height: 44px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 10px 12px;
+      background: white;
+      color: var(--ink);
+    }
+
+    @media (max-width: 920px) {
+      .topbar,
+      .layout {
+        grid-template-columns: 1fr;
+        display: grid;
+      }
+
+      .stats {
+        min-width: 0;
+      }
+    }
+
+    @media (max-width: 620px) {
+      .shell {
+        width: min(100% - 20px, 1160px);
+        padding-top: 18px;
+      }
+
+      .panel-body,
+      .panel-header {
+        padding: 14px;
+      }
+
+      .answer-row,
+      .settings,
+      .file-row {
+        grid-template-columns: 1fr;
+      }
+
+      .controls .btn {
+        flex: 1 1 130px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <section class="topbar">
+      <div>
+        <h1>英语听写复习</h1>
+      </div>
+      <div class="stats" aria-label="复习统计">
+        <button class="stat stat-action" data-library-filter="all" type="button" title="查看全部内容">
+          <strong id="totalCount">0</strong><span>条内容</span>
+        </button>
+        <button class="stat stat-action" data-library-filter="reviewed" type="button" title="查看已复习内容">
+          <strong id="reviewedItemCount">0</strong><span>已复习词数</span>
+        </button>
+        <button class="stat stat-action" data-library-filter="reviewed" type="button" title="查看已复习内容">
+          <strong id="reviewedCount">0</strong><span>复习次数</span>
+        </button>
+        <button class="stat stat-action" data-library-filter="mastered" type="button" title="查看完全掌握的内容">
+          <strong id="masteredCount">0</strong><span>完全掌握</span>
+        </button>
+        <button class="stat stat-action" data-library-filter="correct" type="button" title="查看答对过的内容">
+          <strong id="accuracyCount">0%</strong><span>正确率</span>
+        </button>
+        <button class="stat stat-action" data-library-filter="due" type="button" title="查看到期复习内容">
+          <strong id="dueCount">0</strong><span>到期复习</span>
+        </button>
+      </div>
+    </section>
+
+    <section class="layout">
+      <article class="panel review-stage">
+        <div class="panel-header">
+          <h2>听词辨义</h2>
+          <div class="controls">
+            <label class="round-control">
+              <span>本轮数量</span>
+              <input id="roundSizeInput" type="number" min="1" max="99" value="5" inputmode="numeric" aria-label="本轮练习数量">
+            </label>
+            <button class="btn primary" id="randomBtn" type="button" title="复习已经到期的内容">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 6v6l4 2M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              到期复习
+            </button>
+            <button class="btn" id="nextBtn" type="button" title="进入下一条">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14m0 0-5-5m5 5-5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              下一条
+            </button>
+          </div>
+        </div>
+
+        <div class="panel-body">
+          <div class="prompt empty" id="promptBox">
+            <div>
+              <div class="prompt-label">准备好了</div>
+              <p>先添加几条英文材料，再开始随机听写练习。</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel-body">
+          <div class="answer-row">
+            <textarea id="answerInput" placeholder="听到后写出单词或词组..." autocomplete="off" spellcheck="false"></textarea>
+            <button class="btn" id="answerMicBtn" type="button" title="用语音输入你的答案">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V6a3 3 0 0 0-3-3Z" stroke="currentColor" stroke-width="2"/><path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v3M8 22h8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+              语音输入
+            </button>
+            <button class="btn primary" id="checkBtn" type="button" title="检查答案">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m20 6-11 11-5-5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              检查
+            </button>
+          </div>
+          <div class="result" id="resultBox">你的练习结果会显示在这里。</div>
+        </div>
+      </article>
+
+      <aside class="panel">
+        <div class="panel-header">
+          <h2>学习材料</h2>
+        </div>
+        <div class="panel-body form-grid">
+          <div class="tabs" role="tablist">
+            <button class="tab active" id="addTab" type="button">添加</button>
+            <button class="tab" id="libraryTab" type="button">词库</button>
+          </div>
+
+          <section id="addPane" class="form-grid">
+            <label>
+              <span>单词或词组</span>
+              <div class="input-wrap">
+                <input id="titleInput" maxlength="90" placeholder="e.g. resilient">
+                <div class="field-actions">
+                  <button class="btn" id="titleMicBtn" type="button" title="语音输入单词或词组">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V6a3 3 0 0 0-3-3Z" stroke="currentColor" stroke-width="2"/><path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v3M8 22h8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                    语音输入
+                  </button>
+                </div>
+              </div>
+            </label>
+            <p class="hint">保存前会尽量检查拼写。若词典查不到或结果不确定，会先让你确认是否仍然添加。</p>
+            <div class="settings">
+              <label>
+                <span>朗读声音</span>
+                <select id="voiceSelect"></select>
+              </label>
+              <label>
+                <span>朗读速度</span>
+                <select id="rateSelect">
+                  <option value="0.5">0.5</option>
+                  <option value="0.75">0.75</option>
+                  <option value="1.0" selected>1.0</option>
+                  <option value="1.2">1.2</option>
+                  <option value="1.5">1.5</option>
+                </select>
+              </label>
+            </div>
+            <button class="btn primary" id="saveBtn" type="button">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M17 21v-8H7v8M7 3v5h8" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+              校验并保存
+            </button>
+            <button class="btn" id="notifyBtn" type="button">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              开启复习提醒
+            </button>
+            <div class="notice" id="formNotice"></div>
+          </section>
+
+          <section id="libraryPane" class="form-grid hidden">
+            <div class="file-row">
+              <button class="btn" id="exportBtn" type="button">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3v12m0 0 4-4m-4 4-4-4M5 21h14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                导出
+              </button>
+              <button class="btn" id="importBtn" type="button">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 21V9m0 0 4 4m-4-4-4 4M5 3h14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                导入
+              </button>
+              <input class="hidden" id="importFile" type="file" accept="application/json">
+            </div>
+            <label class="library-search">
+              <span>搜索词库</span>
+              <input id="librarySearchInput" placeholder="输入单词、词组或句子...">
+            </label>
+            <div class="list" id="itemList"></div>
+            <button class="btn danger" id="clearBtn" type="button">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2M6 6l1 15h10l1-15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              清空全部
+            </button>
+          </section>
+        </div>
+      </aside>
+    </section>
+  </main>
+
+  <script>
+    const storageKey = "english-dictation-review-v1";
+    const settingsKey = "english-dictation-review-settings-v1";
+    const exportedLibraryFile = "词库导出.json";
+    const sharedMode = new URLSearchParams(window.location.search).get("shared") === "1";
+    const sharedApiUrl = "/api/items";
+    const reviewScheduleMinutes = [0, 2880, 5760, 10080, 21600, 43200];
+    const state = {
+      items: [],
+      currentId: null,
+      roundIds: [],
+      roundIndex: 0,
+      libraryFilter: "all",
+      voices: [],
+      browserVoices: [],
+      azureTtsConfigured: false,
+      settings: {
+        voiceName: "",
+        rate: "1.0"
+      },
+      editingId: null,
+      pendingJudgement: null,
+      reviewStep: "spelling",
+      currentReview: null,
+      lastSpeechVoiceName: "",
+      nextSpeechVoiceIndex: 0,
+      nextBrowserVoiceIndex: 0,
+      slowSpeechVoiceNames: [],
+      speechWarmed: false,
+      lastNotificationAt: 0,
+      syncing: false,
+      lastSharedCount: 0
+    };
+
+    const els = {
+      totalCount: document.getElementById("totalCount"),
+      reviewedItemCount: document.getElementById("reviewedItemCount"),
+      masteredCount: document.getElementById("masteredCount"),
+      statFilterButtons: document.querySelectorAll("[data-library-filter]"),
+      reviewedCount: document.getElementById("reviewedCount"),
+      accuracyCount: document.getElementById("accuracyCount"),
+      dueCount: document.getElementById("dueCount"),
+      roundSizeInput: document.getElementById("roundSizeInput"),
+      randomBtn: document.getElementById("randomBtn"),
+      nextBtn: document.getElementById("nextBtn"),
+      answerMicBtn: document.getElementById("answerMicBtn"),
+      checkBtn: document.getElementById("checkBtn"),
+      promptBox: document.getElementById("promptBox"),
+      answerInput: document.getElementById("answerInput"),
+      resultBox: document.getElementById("resultBox"),
+      titleInput: document.getElementById("titleInput"),
+      titleMicBtn: document.getElementById("titleMicBtn"),
+      voiceSelect: document.getElementById("voiceSelect"),
+      rateSelect: document.getElementById("rateSelect"),
+      saveBtn: document.getElementById("saveBtn"),
+      notifyBtn: document.getElementById("notifyBtn"),
+      formNotice: document.getElementById("formNotice"),
+      addTab: document.getElementById("addTab"),
+      libraryTab: document.getElementById("libraryTab"),
+      addPane: document.getElementById("addPane"),
+      libraryPane: document.getElementById("libraryPane"),
+      librarySearchInput: document.getElementById("librarySearchInput"),
+      itemList: document.getElementById("itemList"),
+      exportBtn: document.getElementById("exportBtn"),
+      importBtn: document.getElementById("importBtn"),
+      importFile: document.getElementById("importFile"),
+      clearBtn: document.getElementById("clearBtn")
+    };
+
+    let activePlayButton = null;
+    let activeFallbackTimer = null;
+    let activeUtterance = null;
+    let activeAudio = null;
+    let speechRequestToken = 0;
+    let syncTimer = null;
+    let repeatPlayback = {
+      active: false,
+      button: null,
+      text: "",
+      token: 0
+    };
+
+    const ONLINE_TTS_VOICES = [
+      { name: "en-US-JennyNeural", label: "Jenny 在线自然女声", gender: "女声", lang: "en-US", onlineTts: true },
+      { name: "en-US-DavisNeural", label: "Davis 在线自然男声", gender: "男声", lang: "en-US", onlineTts: true },
+      { name: "en-US-AriaNeural", label: "Aria 在线自然女声", gender: "女声", lang: "en-US", onlineTts: true },
+      { name: "en-US-GuyNeural", label: "Guy 在线自然男声", gender: "男声", lang: "en-US", onlineTts: true }
+    ];
+
+    function load() {
+      try {
+        const parsed = JSON.parse(localStorage.getItem(storageKey) || "[]");
+        state.items = Array.isArray(parsed) ? parsed : [];
+      } catch {
+        state.items = [];
+      }
+      try {
+        const parsedSettings = JSON.parse(localStorage.getItem(settingsKey) || "{}");
+        if (parsedSettings && typeof parsedSettings === "object") {
+          state.settings = { ...state.settings, ...parsedSettings };
+        }
+      } catch {
+        state.settings = { voiceName: "", rate: "1.0" };
+      }
+      els.rateSelect.value = state.settings.rate || "1.0";
+      migrateItems();
+    }
+
+    function persist() {
+      localStorage.setItem(storageKey, JSON.stringify(state.items));
+      scheduleSharedSave();
+    }
+
+    function persistSettings() {
+      localStorage.setItem(settingsKey, JSON.stringify(state.settings));
+    }
+
+    function scheduleSharedSave() {
+      if (!sharedMode) return;
+      window.clearTimeout(syncTimer);
+      syncTimer = window.setTimeout(saveSharedItems, 350);
+    }
+
+    async function saveSharedItems() {
+      if (!sharedMode || state.syncing) return;
+      state.syncing = true;
+      try {
+        const response = await fetch(sharedApiUrl, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ items: state.items })
+        });
+        if (!response.ok) throw new Error("Save failed");
+        state.lastSharedCount = state.items.length;
+      } catch {
+        setNotice("共享保存暂时失败，请确认服务器还在运行。", "warn");
+      } finally {
+        state.syncing = false;
+      }
+    }
+
+    async function loadSharedItems() {
+      if (!sharedMode) return false;
+      try {
+        const response = await fetch(sharedApiUrl, { cache: "no-store" });
+        if (!response.ok) throw new Error("Load failed");
+        const payload = await response.json();
+        const sharedItems = cleanImportedItems(payload.items || []);
+        state.lastSharedCount = sharedItems.length;
+
+        if (state.items.length > sharedItems.length) {
+          await saveSharedItems();
+          setNotice(`已把本机 ${state.items.length} 条词库同步到共享服务器。`, "ok");
+          return true;
+        }
+
+        if (sharedItems.length) {
+          state.items = sharedItems;
+          localStorage.setItem(storageKey, JSON.stringify(state.items));
+          setNotice(`已加载共享词库 ${sharedItems.length} 条。`, "ok");
+          return true;
+        }
+      } catch {
+        setNotice("共享词库暂时无法连接，已使用本机缓存。", "warn");
+      }
+      return false;
+    }
+
+    async function refreshSharedItems() {
+      if (!sharedMode || state.syncing) return;
+      try {
+        const response = await fetch(sharedApiUrl, { cache: "no-store" });
+        if (!response.ok) return;
+        const payload = await response.json();
+        const sharedItems = cleanImportedItems(payload.items || []);
+        if (sharedItems.length > state.items.length || sharedItems.length !== state.lastSharedCount) {
+          state.items = sharedItems;
+          state.lastSharedCount = sharedItems.length;
+          localStorage.setItem(storageKey, JSON.stringify(state.items));
+          migrateItems();
+          renderAll();
+        }
+      } catch {
+        // Keep the page usable with local cached data if the shared server is offline.
+      }
+    }
+
+    function cleanImportedItems(data) {
+      if (!Array.isArray(data)) throw new Error("Invalid file");
+      return data
+        .filter(item => item && isEnglishOnly(String(item.title || "")))
+        .map(item => ({
+          id: item.id || (crypto.randomUUID ? crypto.randomUUID() : String(Date.now() + Math.random())),
+          title: String(item.title || "").trim(),
+          reviews: Number(item.reviews || 0),
+          correct: Number(item.correct || 0),
+          memoryStage: Number(item.memoryStage || 0),
+          nextReviewAt: item.nextReviewAt || new Date().toISOString(),
+          lastScore: item.lastScore,
+          createdAt: item.createdAt || new Date().toISOString()
+        }))
+        .filter(item => item.title);
+    }
+
+    async function restoreFromExportIfEmpty() {
+      if (state.items.length) return;
+
+      try {
+        const response = await fetch(encodeURI(exportedLibraryFile), { cache: "no-store" });
+        if (!response.ok) return;
+        const data = await response.json();
+        const clean = cleanImportedItems(data);
+        if (!clean.length) return;
+        state.items = clean;
+        persist();
+        setNotice(`已从 ${exportedLibraryFile} 自动恢复 ${clean.length} 条词库。`, "ok");
+      } catch {
+        // The backup file is optional; users can still import manually.
+      }
+    }
+
+    function migrateItems() {
+      const now = new Date().toISOString();
+      let changed = false;
+      state.items.forEach(item => {
+        if (item.content || item.definitionSource) {
+          delete item.content;
+          delete item.definitionSource;
+          changed = true;
+        }
+        if (!Number.isFinite(Number(item.memoryStage))) {
+          item.memoryStage = Math.min(Number(item.correct || 0), reviewScheduleMinutes.length - 1);
+          changed = true;
+        }
+        if (!item.nextReviewAt) {
+          item.nextReviewAt = item.lastReviewedAt || item.createdAt || now;
+          changed = true;
+        }
+      });
+      if (changed) persist();
+    }
+
+    function isEnglishOnly(value) {
+      return /^[\x09\x0A\x0D\x20-\x7E]*$/.test(value) && !/[\u3400-\u9FFF\uF900-\uFAFF]/.test(value);
+    }
+
+    function normalized(value) {
+      return value
+        .toLowerCase()
+        .replace(/[\u201C\u201D]/g, "\"")
+        .replace(/[\u2018\u2019]/g, "'")
+        .replace(/[^a-z0-9'\s-]/g, " ")
+        .replace(/\s+/g, " ")
+        .trim();
+    }
+    function words(value) {
+      const text = normalized(value);
+      return text ? text.split(" ") : [];
+    }
+
+    const commonEnglishWords = new Set([
+      "a", "able", "about", "above", "across", "actually", "after", "again", "against", "all", "almost",
+      "alone", "along", "already", "also", "although", "always", "am", "among", "an", "and", "another",
+      "any", "anyone", "anything", "are", "around", "as", "ask", "asked", "at", "away", "back", "bad",
+      "be", "because", "become", "been", "before", "being", "best", "better", "between", "big", "both",
+      "bring", "but", "by", "came", "can", "cannot", "cant", "case", "child", "children", "come", "comes",
+      "coming", "could", "day", "did", "different", "do", "does", "doing", "done", "down", "each", "early",
+      "easy", "end", "enough", "even", "ever", "every", "everyone", "everything", "family", "far", "feel",
+      "few", "find", "first", "for", "found", "friend", "friends", "from", "gave", "get", "gets", "getting",
+      "give", "given", "go", "goes", "going", "gone", "good", "got", "great", "had", "has", "have", "having",
+      "he", "her", "here", "hers", "him", "his", "home", "how", "however", "i", "if", "important", "in",
+      "into", "is", "it", "its", "just", "keep", "kind", "know", "known", "large", "last", "late", "learn",
+      "left", "less", "let", "life", "like", "liked", "little", "long", "look", "made", "make", "makes",
+      "making", "many", "may", "me", "might", "more", "most", "much", "must", "my", "need", "never", "new",
+      "next", "no", "not", "now", "of", "off", "often", "old", "on", "once", "one", "only", "or", "other",
+      "our", "out", "over", "own", "part", "people", "place", "please", "point", "put", "quite", "really",
+      "right", "said", "same", "say", "says", "see", "seem", "seen", "she", "should", "sibling", "siblings",
+      "small", "so", "some", "someone", "something", "still", "such", "take", "taken", "than", "that", "the",
+      "their", "them", "then", "there", "these", "they", "thing", "things", "this", "those", "three",
+      "through", "time", "to", "too", "took", "two", "under", "until", "up", "us", "use", "used", "usually",
+      "very", "want", "was", "way", "we", "well", "went", "were", "what", "when", "where", "which", "while",
+      "who", "why", "will", "with", "without", "word", "words", "work", "would", "year", "yes", "you",
+      "your", "yours"
+    ]);
+
+    function isCommonOrSimpleVariant(word) {
+      if (!word) return true;
+      if (commonEnglishWords.has(word)) return true;
+      if (word.endsWith("s") && commonEnglishWords.has(word.slice(0, -1))) return true;
+      if (word.endsWith("es") && commonEnglishWords.has(word.slice(0, -2))) return true;
+      if (word.endsWith("ed") && commonEnglishWords.has(word.slice(0, -2))) return true;
+      if (word.endsWith("ing") && commonEnglishWords.has(word.slice(0, -3))) return true;
+      if (word.endsWith("ing") && commonEnglishWords.has(`${word.slice(0, -3)}e`)) return true;
+      return false;
+    }
+
+    function shouldSkipOnlineDictionaryCheck(term) {
+      const termWords = words(term);
+      if (!termWords.length) return false;
+      if (termWords.length >= 4) return true;
+      return termWords.every(word => isCommonOrSimpleVariant(word));
+    }
+
+    function expandContractions(value) {
+      const contractionMap = {
+        "i'm": "i am",
+        "you're": "you are",
+        "we're": "we are",
+        "they're": "they are",
+        "he's": "he is",
+        "she's": "she is",
+        "it's": "it is",
+        "that's": "that is",
+        "there's": "there is",
+        "here's": "here is",
+        "what's": "what is",
+        "where's": "where is",
+        "when's": "when is",
+        "who's": "who is",
+        "why's": "why is",
+        "how's": "how is",
+        "i've": "i have",
+        "you've": "you have",
+        "we've": "we have",
+        "they've": "they have",
+        "i'll": "i will",
+        "you'll": "you will",
+        "we'll": "we will",
+        "they'll": "they will",
+        "he'll": "he will",
+        "she'll": "she will",
+        "it'll": "it will",
+        "don't": "do not",
+        "doesn't": "does not",
+        "didn't": "did not",
+        "can't": "can not",
+        "couldn't": "could not",
+        "won't": "will not",
+        "wouldn't": "would not",
+        "shouldn't": "should not",
+        "isn't": "is not",
+        "aren't": "are not",
+        "wasn't": "was not",
+        "weren't": "were not",
+        "haven't": "have not",
+        "hasn't": "has not",
+        "hadn't": "had not"
+      };
+      return normalized(value)
+        .split(" ")
+        .map(word => contractionMap[word] || word)
+        .join(" ")
+        .replace(/\s+/g, " ")
+        .trim();
+    }
+
+    function getCurrentItem() {
+      return state.items.find(item => item.id === state.currentId) || null;
+    }
+
+    function getRoundPosition() {
+      if (!state.roundIds.length || !state.currentId) return "";
+      return `第 ${state.roundIndex + 1} / ${state.roundIds.length} 条`;
+    }
+
+    function isMastered(item) {
+      return Number(item.correct || 0) >= 5;
+    }
+
+    function isSameLocalDay(first, second) {
+      if (!first || !second) return false;
+      const firstDate = new Date(first);
+      const secondDate = new Date(second);
+      if (Number.isNaN(firstDate.getTime()) || Number.isNaN(secondDate.getTime())) return false;
+      return firstDate.getFullYear() === secondDate.getFullYear()
+        && firstDate.getMonth() === secondDate.getMonth()
+        && firstDate.getDate() === secondDate.getDate();
+    }
+
+    function isCreatedToday(item) {
+      return isSameLocalDay(item.createdAt, new Date());
+    }
+
+    function getTomorrowStartIso() {
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      tomorrow.setHours(0, 0, 0, 0);
+      return tomorrow.toISOString();
+    }
+
+    function getReviewableItems(items = state.items) {
+      return items.filter(item => !isMastered(item) && !isCreatedToday(item));
+    }
+
+    function getDueItems() {
+      const now = Date.now();
+      return getReviewableItems().filter(item => !item.nextReviewAt || new Date(item.nextReviewAt).getTime() <= now);
+    }
+
+    function scheduleNextReview(item, remembered) {
+      const currentStage = Math.min(Number(item.memoryStage || 0), reviewScheduleMinutes.length - 1);
+      const nextStage = remembered
+        ? Math.min(currentStage + 1, reviewScheduleMinutes.length - 1)
+        : Math.max(0, currentStage - 1);
+      const minutes = remembered ? reviewScheduleMinutes[nextStage] : reviewScheduleMinutes[1];
+      item.memoryStage = remembered ? nextStage : 0;
+      item.nextReviewAt = new Date(Date.now() + minutes * 60 * 1000).toISOString();
+    }
+
+    function formatReviewTime(value) {
+      if (!value) return "现在";
+      const time = new Date(value).getTime();
+      const diff = time - Date.now();
+      if (diff <= 0) return "现在";
+      const minutes = Math.ceil(diff / 60000);
+      if (minutes < 60) return `${minutes} 分钟后`;
+      const hours = Math.ceil(minutes / 60);
+      if (hours < 24) return `${hours} 小时后`;
+      const days = Math.ceil(hours / 24);
+      return `${days} 天后`;
+    }
+
+    function formatEntryDate(value) {
+      const date = value ? new Date(value) : new Date();
+      if (Number.isNaN(date.getTime())) return "-- -- --".replaceAll(" ", "-");
+      const year = String(date.getFullYear()).slice(-2);
+      const month = String(date.getMonth() + 1).padStart(2, "0");
+      const day = String(date.getDate()).padStart(2, "0");
+      return `${year}-${month}-${day}`;
+    }
+
+    function maybeNotifyDueItems() {
+      if (!("Notification" in window) || Notification.permission !== "granted") return;
+      const dueItems = getDueItems();
+      const now = Date.now();
+      if (!dueItems.length || now - state.lastNotificationAt < 30 * 60 * 1000) return;
+      state.lastNotificationAt = now;
+      new Notification("英语听写复习", {
+        body: `现在有 ${dueItems.length} 条内容该复习了。`,
+        tag: "english-dictation-review"
+      });
+    }
+
+    function prepareSpeechText(text) {
+      return text.replace(/\bhr\b/gi, "H R");
+    }
+
+    function guessVoiceGenderLabel(voice) {
+      const name = voice.name.toLowerCase();
+      const femaleHints = [
+        "female", "woman", "aria", "ava", "emma", "jenny", "michelle", "zira", "samantha",
+        "susan", "heather", "linda", "allison", "victoria", "karen", "moira", "salli",
+        "tessa", "veena", "serena", "nicky", "joanna", "kendra", "kimberly", "ivy"
+      ];
+      const maleHints = [
+        "male", "man", "roger", "david", "mark", "guy", "william", "christopher", "eric",
+        "brian", "daniel", "fred", "alex", "tom", "matthew", "justin", "joey", "davis",
+        "steffan", "brandon", "jason", "tony", "jacob", "aaron", "evan", "nathan",
+        "oliver", "lee", "ralph", "albert", "bruce"
+      ];
+      if (femaleHints.some(hint => name.includes(hint))) return "女声";
+      if (maleHints.some(hint => name.includes(hint))) return "男声";
+      return "性别未知";
+    }
+
+    function pickPreferredAmericanVoices(voices) {
+      const preferred = [
+        { gender: "女声", names: ["Microsoft Jenny Online", "Jenny Online", "Microsoft Aria Online", "Aria Online"] },
+        { gender: "男声", names: ["Microsoft Davis Online", "Davis Online", "Microsoft Guy Online", "Guy Online"] },
+        { gender: "女声", names: ["Microsoft Ava Online", "Ava Online", "Microsoft Michelle Online", "Michelle Online"] },
+        { gender: "男声", names: ["Microsoft Christopher Online", "Christopher Online", "Microsoft Eric Online", "Eric Online"] }
+      ];
+      const picked = [];
+      const isPicked = voice => picked.some(item => item.name === voice.name);
+      const rankVoice = (voice, names) => {
+        const lowerName = voice.name.toLowerCase();
+        const nameIndex = names.findIndex(name => lowerName.includes(name.toLowerCase()));
+        const preferredNameScore = nameIndex >= 0 ? (1000 - nameIndex * 20) : 0;
+        const naturalScore = lowerName.includes("natural") ? 500 : 0;
+        const onlineScore = lowerName.includes("online") || voice.localService === false ? 400 : 0;
+        const usScore = /^en[-_]US$/i.test(voice.lang) ? 200 : 0;
+        const localPenalty = voice.localService ? -300 : 0;
+        return preferredNameScore + naturalScore + onlineScore + usScore + localPenalty;
+      };
+      preferred.forEach(rule => {
+        const candidate = voices
+          .filter(voice => guessVoiceGenderLabel(voice) === rule.gender && !isPicked(voice))
+          .sort((a, b) => rankVoice(b, rule.names) - rankVoice(a, rule.names))[0];
+        if (candidate) picked.push(candidate);
+      });
+      ["女声", "男声"].forEach(gender => {
+        while (picked.filter(voice => guessVoiceGenderLabel(voice) === gender).length < 2) {
+          const fallback = voices
+            .filter(voice => guessVoiceGenderLabel(voice) === gender && !isPicked(voice))
+            .sort((a, b) => rankVoice(b, []) - rankVoice(a, []))[0];
+          if (!fallback) break;
+          picked.push(fallback);
+        }
+      });
+      return picked.slice(0, 4);
+    }
+
+    function pickNextVoice() {
+      const selected = state.voices.find(voice => voice.name === els.voiceSelect.value);
+      if (selected && !state.slowSpeechVoiceNames.includes(selected.name)) return selected;
+      return state.voices.find(voice => !state.slowSpeechVoiceNames.includes(voice.name)) || selected || null;
+    }
+
+    function pickNextBrowserVoice() {
+      if (!("speechSynthesis" in window)) return null;
+      const selected = state.browserVoices.find(voice => voice.name === els.voiceSelect.value);
+      const failedNames = new Set(state.slowSpeechVoiceNames || []);
+      if (selected && !failedNames.has(selected.name)) return selected;
+      const available = state.browserVoices.filter(voice => !failedNames.has(voice.name));
+      return available.find(voice => voice.localService !== false) || available[0]
+        || { name: "browser-default", lang: "en-US", defaultBrowserVoice: true };
+    }
+
+    function speakerIconSvg() {
+      return `<svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4V5ZM15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+    }
+
+    function setPlayButtonState(button, stateName) {
+      if (!button) return;
+      if (!button.dataset.originalHtml) {
+        button.dataset.originalHtml = button.innerHTML;
+      }
+      if (stateName === "idle") {
+        button.classList.remove("is-speaking");
+        button.disabled = false;
+        button.innerHTML = button.dataset.originalHtml || "播放";
+        return;
+      }
+      button.classList.add("is-speaking");
+      button.disabled = true;
+      const label = stateName === "loading" ? "加载中" : "播放中";
+      button.innerHTML = `${speakerIconSvg()} ${label}`;
+    }
+
+    function setRepeatButtonState(button, active) {
+      if (!button) return;
+      if (!button.dataset.originalHtml) {
+        button.dataset.originalHtml = button.innerHTML;
+      }
+      button.classList.toggle("is-speaking", active);
+      button.disabled = false;
+      button.innerHTML = active
+        ? `${speakerIconSvg()} 停止重复`
+        : button.dataset.originalHtml;
+    }
+
+    function stopRepeatPlayback() {
+      if (!repeatPlayback.active) return;
+      const button = repeatPlayback.button;
+      repeatPlayback.active = false;
+      repeatPlayback.button = null;
+      repeatPlayback.text = "";
+      repeatPlayback.token += 1;
+      speechRequestToken += 1;
+      activeUtterance = null;
+      if (activeAudio) {
+        activeAudio.pause();
+        activeAudio = null;
+      }
+      setRepeatButtonState(button, false);
+      if (activeFallbackTimer) {
+        clearTimeout(activeFallbackTimer);
+        activeFallbackTimer = null;
+      }
+      if ("speechSynthesis" in window) {
+        window.speechSynthesis.cancel();
+      }
+    }
+
+    function startRepeatPlayback(text, button) {
+      stopRepeatPlayback();
+      repeatPlayback.active = true;
+      repeatPlayback.button = button;
+      repeatPlayback.text = text;
+      repeatPlayback.token += 1;
+      const token = repeatPlayback.token;
+      setRepeatButtonState(button, true);
+
+      const playNext = () => {
+        if (!repeatPlayback.active || repeatPlayback.token !== token) return;
+        speak(text, null, {
+          onDone: () => {
+            if (!repeatPlayback.active || repeatPlayback.token !== token) return;
+            setTimeout(playNext, 350);
+          }
+        });
+      };
+      playNext();
+    }
+
+    function warmUpSpeechEngine() {
+      if (state.speechWarmed || !("speechSynthesis" in window)) return;
+      if (activePlayButton || window.speechSynthesis.speaking || window.speechSynthesis.pending) return;
+      const voice = state.browserVoices[0];
+      if (!voice) return;
+      state.speechWarmed = true;
+      const utterance = new SpeechSynthesisUtterance("ready");
+      utterance.lang = "en-US";
+      utterance.voice = voice;
+      utterance.rate = Number(state.settings.rate || "1.0");
+      utterance.volume = 0;
+      try {
+        window.speechSynthesis.resume();
+        window.speechSynthesis.speak(utterance);
+      } catch {
+        state.speechWarmed = false;
+      }
+    }
+
+    function speak(text, playButton = null, options = {}) {
+      if (activeFallbackTimer) {
+        clearTimeout(activeFallbackTimer);
+        activeFallbackTimer = null;
+      }
+      if (activeAudio) {
+        activeAudio.pause();
+        activeAudio = null;
+      }
+      if (activePlayButton && activePlayButton !== playButton) {
+        setPlayButtonState(activePlayButton, "idle");
+      }
+      activePlayButton = playButton;
+      setPlayButtonState(playButton, "loading");
+      const requestToken = ++speechRequestToken;
+      let finished = false;
+      const attemptedVoiceNames = new Set();
+
+      const finishSpeech = reason => {
+        if (finished || requestToken !== speechRequestToken) return;
+        finished = true;
+        if (activeFallbackTimer) {
+          clearTimeout(activeFallbackTimer);
+          activeFallbackTimer = null;
+        }
+        activeUtterance = null;
+        setPlayButtonState(playButton, "idle");
+        if (activePlayButton === playButton) activePlayButton = null;
+        options.onDone?.(reason);
+      };
+
+      const playWithBrowserFallback = reason => {
+        const browserVoice = pickNextBrowserVoice();
+        if (!("speechSynthesis" in window) || !browserVoice) {
+          if (reason === "online-unavailable") {
+            setResult("在线语音暂不可用，且当前浏览器没有可用的美式朗读声音。", "bad");
+          }
+          finishSpeech(reason);
+          return;
+        }
+        playWithVoice(browserVoice);
+      };
+
+      const playWithOnlineVoice = voice => {
+        if (!voice || !voice.onlineTts) {
+          if ("speechSynthesis" in window && voice) {
+            playWithVoice(voice);
+          } else {
+            playWithBrowserFallback("online-unavailable");
+          }
+          return;
+        }
+        const audioUrl = `/api/tts?text=${encodeURIComponent(prepareSpeechText(text))}&voice=${encodeURIComponent(voice.name)}&rate=${encodeURIComponent(state.settings.rate || els.rateSelect.value || "1.0")}`;
+        const audio = new Audio(audioUrl);
+        activeAudio = audio;
+        let started = false;
+        let failed = false;
+        const fallbackOnce = reason => {
+          if (failed || finished || requestToken !== speechRequestToken) return;
+          failed = true;
+          audio.pause();
+          if (activeAudio === audio) activeAudio = null;
+          playWithBrowserFallback(reason);
+        };
+        activeFallbackTimer = setTimeout(() => {
+          if (started || finished || requestToken !== speechRequestToken) return;
+          fallbackOnce("online-timeout");
+        }, 5000);
+        audio.onplaying = () => {
+          if (requestToken !== speechRequestToken) return;
+          started = true;
+          if (activeFallbackTimer) {
+            clearTimeout(activeFallbackTimer);
+            activeFallbackTimer = null;
+          }
+          setPlayButtonState(playButton, "speaking");
+        };
+        audio.onended = () => {
+          if (activeAudio === audio) activeAudio = null;
+          finishSpeech("end");
+        };
+        audio.onerror = () => fallbackOnce("online-unavailable");
+        audio.play().catch(() => fallbackOnce("online-unavailable"));
+      };
+
+      const playWithVoice = voice => {
+        if (finished || requestToken !== speechRequestToken) return;
+        if (voice) attemptedVoiceNames.add(voice.name);
+        let started = false;
+        let attemptComplete = false;
+        const utterance = new SpeechSynthesisUtterance(prepareSpeechText(text));
+        activeUtterance = utterance;
+        utterance.lang = "en-US";
+        utterance.rate = Number(state.settings.rate || els.rateSelect.value || "1.0");
+        if (voice && !voice.defaultBrowserVoice) utterance.voice = voice;
+
+        const retryOrFinish = reason => {
+          if (finished || attemptComplete || requestToken !== speechRequestToken) return;
+          attemptComplete = true;
+          if (voice) {
+            if (!state.slowSpeechVoiceNames.includes(voice.name)) {
+              state.slowSpeechVoiceNames.push(voice.name);
+            }
+            const nextVoice = pickNextBrowserVoice();
+            if (nextVoice && !attemptedVoiceNames.has(nextVoice.name)) {
+              if (playButton) playButton.title = "当前声音不可用，正在自动切换到下一个声音。";
+              window.speechSynthesis.cancel();
+              activeUtterance = null;
+              setTimeout(() => playWithVoice(nextVoice), 180);
+              return;
+            }
+          }
+          if (voice) {
+            window.speechSynthesis.cancel();
+            activeUtterance = null;
+          }
+          finishSpeech(reason);
+        };
+
+        utterance.onstart = () => {
+          if (requestToken !== speechRequestToken) return;
+          started = true;
+          if (activeFallbackTimer) {
+            clearTimeout(activeFallbackTimer);
+            activeFallbackTimer = null;
+          }
+          setPlayButtonState(playButton, "speaking");
+        };
+        utterance.onend = () => {
+          if (attemptComplete) return;
+          attemptComplete = true;
+          finishSpeech("end");
+        };
+        utterance.onerror = () => retryOrFinish("error");
+
+        window.speechSynthesis.resume();
+        setTimeout(() => {
+          if (finished || requestToken !== speechRequestToken) return;
+          window.speechSynthesis.speak(utterance);
+          const loadingTimeout = voice && !voice.localService ? 12000 : 5000;
+          activeFallbackTimer = setTimeout(() => {
+            if (started || requestToken !== speechRequestToken) return;
+            window.speechSynthesis.cancel();
+            retryOrFinish("timeout");
+          }, loadingTimeout);
+        }, 120);
+      };
+
+      if ("speechSynthesis" in window) window.speechSynthesis.cancel();
+      playWithOnlineVoice(pickNextVoice());
+    }
+
+    function getSpeechRecognition() {
+      return window.SpeechRecognition || window.webkitSpeechRecognition || null;
+    }
+
+    function lowerFirstLetter(value) {
+      return value.replace(/[A-Z]/, letter => letter.toLowerCase());
+    }
+
+    function normalizeRecognizedSentence(value) {
+      let text = value
+        .replace(/[\u201C\u201D]/g, "\"")
+        .replace(/[\u2018\u2019]/g, "'")
+        .replace(/\s+/g, " ")
+        .trim();
+
+      text = text.replace(/([,;:])\s+([A-Z][a-z])/g, (match, mark, word) => `${mark} ${lowerFirstLetter(word)}`);
+      text = text.replace(/\b(am|is|are|was|were|be|been|being|have|has|had|do|does|did|can|could|will|would|should|may|might|must)\.\s+([A-Z][a-z])/gi, (match, helper, nextWord) => `${helper} ${lowerFirstLetter(nextWord)}`);
+      text = text.replace(/\b(and|or|but|because|if|when|while|after|before|by the time|so|to|of|for|with|without|in|on|at|from|as|than|that|which|who)\.\s+([A-Z][a-z])/gi, (match, linker, nextWord) => `${linker} ${lowerFirstLetter(nextWord)}`);
+      text = text.replace(/\.\s+([A-Z][a-z]+ing\b)/g, (match, word) => ` ${lowerFirstLetter(word)}`);
+      text = text.replace(/\bi\b/g, "I");
+      text = text.replace(/\bi'/g, "I'");
+      text = text.replace(/^([a-z])/, letter => letter.toUpperCase());
+      text = text.replace(/([.!?]\s+)([a-z])/g, (match, prefix, letter) => `${prefix}${letter.toUpperCase()}`);
+      return text;
+    }
+
+    function showVoiceInputMessage(noticeTarget, message, tone = "bad") {
+      if (noticeTarget === "result") setResult(message, tone);
+      else setNotice(message, tone === "bad" ? "error" : tone);
+    }
+
+    function resetVoiceInputButton(button, originalText) {
+      button.dataset.listening = "false";
+      button.dataset.manualStop = "true";
+      button._recognition = null;
+      button._mediaRecorder = null;
+      button._wavRecorder = null;
+      if (originalText) button.lastChild.textContent = originalText;
+    }
+
+    async function ensureMicrophonePermission() {
+      if (!navigator.mediaDevices?.getUserMedia) return true;
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      stream.getTracks().forEach(track => track.stop());
+      return true;
+    }
+
+    function getVoiceInputDiagnostics() {
+      const hasRecognition = Boolean(getSpeechRecognition());
+      const hasMicrophoneApi = Boolean(navigator.mediaDevices?.getUserMedia);
+      const protocol = window.location.protocol;
+      const browser = navigator.userAgent.includes("Edg/")
+        ? "Microsoft Edge"
+        : navigator.userAgent.includes("Chrome/")
+          ? "Chrome"
+          : navigator.userAgent.includes("Safari/")
+            ? "Safari"
+            : "当前浏览器";
+      return { hasRecognition, hasMicrophoneApi, protocol, browser };
+    }
+
+    function getPreferredRecordingMimeType() {
+      const candidates = [
+        "audio/webm;codecs=opus",
+        "audio/webm",
+        "audio/mp4",
+        "audio/aac",
+        "audio/ogg;codecs=opus"
+      ];
+      if (!window.MediaRecorder) return "";
+      return candidates.find(type => MediaRecorder.isTypeSupported(type)) || "";
+    }
+
+    function mergeFloat32Chunks(chunks) {
+      const totalLength = chunks.reduce((sum, chunk) => sum + chunk.length, 0);
+      const merged = new Float32Array(totalLength);
+      let offset = 0;
+      chunks.forEach(chunk => {
+        merged.set(chunk, offset);
+        offset += chunk.length;
+      });
+      return merged;
+    }
+
+    function downsampleAudioBuffer(buffer, inputSampleRate, outputSampleRate = 16000) {
+      if (inputSampleRate === outputSampleRate) return buffer;
+      const ratio = inputSampleRate / outputSampleRate;
+      const outputLength = Math.round(buffer.length / ratio);
+      const result = new Float32Array(outputLength);
+      let inputOffset = 0;
+      for (let outputOffset = 0; outputOffset < outputLength; outputOffset += 1) {
+        const nextInputOffset = Math.round((outputOffset + 1) * ratio);
+        let sum = 0;
+        let count = 0;
+        for (let index = inputOffset; index < nextInputOffset && index < buffer.length; index += 1) {
+          sum += buffer[index];
+          count += 1;
+        }
+        result[outputOffset] = count ? sum / count : 0;
+        inputOffset = nextInputOffset;
+      }
+      return result;
+    }
+
+    function encodeWav(samples, sampleRate = 16000) {
+      const buffer = new ArrayBuffer(44 + samples.length * 2);
+      const view = new DataView(buffer);
+      const writeString = (offset, value) => {
+        for (let index = 0; index < value.length; index += 1) {
+          view.setUint8(offset + index, value.charCodeAt(index));
+        }
+      };
+
+      writeString(0, "RIFF");
+      view.setUint32(4, 36 + samples.length * 2, true);
+      writeString(8, "WAVE");
+      writeString(12, "fmt ");
+      view.setUint32(16, 16, true);
+      view.setUint16(20, 1, true);
+      view.setUint16(22, 1, true);
+      view.setUint32(24, sampleRate, true);
+      view.setUint32(28, sampleRate * 2, true);
+      view.setUint16(32, 2, true);
+      view.setUint16(34, 16, true);
+      writeString(36, "data");
+      view.setUint32(40, samples.length * 2, true);
+
+      let offset = 44;
+      samples.forEach(sample => {
+        const clamped = Math.max(-1, Math.min(1, sample));
+        view.setInt16(offset, clamped < 0 ? clamped * 0x8000 : clamped * 0x7fff, true);
+        offset += 2;
+      });
+      return buffer;
+    }
+
+    async function createWavRecorder() {
+      const AudioContextConstructor = window.AudioContext || window.webkitAudioContext;
+      if (!AudioContextConstructor || !navigator.mediaDevices?.getUserMedia) {
+        throw new Error("当前浏览器不支持网页录音");
+      }
+
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: {
+          channelCount: 1,
+          echoCancellation: true,
+          noiseSuppression: true,
+          autoGainControl: true
+        }
+      });
+      const audioContext = new AudioContextConstructor();
+      const source = audioContext.createMediaStreamSource(stream);
+      const processor = audioContext.createScriptProcessor(4096, 1, 1);
+      const silentOutput = audioContext.createGain();
+      const chunks = [];
+      let recording = true;
+
+      silentOutput.gain.value = 0;
+      processor.onaudioprocess = event => {
+        if (!recording) return;
+        chunks.push(new Float32Array(event.inputBuffer.getChannelData(0)));
+      };
+      source.connect(processor);
+      processor.connect(silentOutput);
+      silentOutput.connect(audioContext.destination);
+
+      return {
+        async stop() {
+          recording = false;
+          processor.disconnect();
+          source.disconnect();
+          silentOutput.disconnect();
+          stream.getTracks().forEach(track => track.stop());
+          await audioContext.close().catch(() => {});
+          const merged = mergeFloat32Chunks(chunks);
+          const samples = downsampleAudioBuffer(merged, audioContext.sampleRate, 16000);
+          return new Blob([encodeWav(samples, 16000)], { type: "audio/wav" });
+        }
+      };
+    }
+
+    function blobToDataUrl(blob) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = () => reject(reader.error);
+        reader.readAsDataURL(blob);
+      });
+    }
+
+    async function transcribeRecording(blob) {
+      const audioBase64 = await blobToDataUrl(blob);
+      const response = await fetch("/api/transcribe", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          audioBase64,
+          mimeType: blob.type || "audio/webm",
+          prompt: "Transcribe American English dictation from a language-learning practice session."
+        })
+      });
+      const payload = await response.json().catch(() => ({}));
+      if (!response.ok || !payload.ok) {
+        throw new Error(payload.error || `Transcription failed (${response.status})`);
+      }
+      return payload.text || "";
+    }
+
+    function finishRecognizedText(target, noticeTarget, text, afterResult = null) {
+      const finalTranscript = normalizeRecognizedSentence(text);
+      if (!finalTranscript) return false;
+      const separator = target.value.trim() ? " " : "";
+      target.value = `${target.value.trim()}${separator}${finalTranscript}`.trim();
+      target.dispatchEvent(new Event("input"));
+      if (noticeTarget === "result") setResult("语音输入已完成，可以检查答案。", "good");
+      else setNotice("语音输入已完成。", "ok");
+      if (afterResult) afterResult(finalTranscript, [finalTranscript]);
+      return true;
+    }
+
+    async function startBrowserSpeechInput(target, noticeTarget, button = els.answerMicBtn, afterResult = null) {
+      const Recognition = getSpeechRecognition();
+      if (!Recognition) return false;
+      if (button.dataset.listening === "true" && button._recognition) {
+        button.dataset.manualStop = "true";
+        button._recognition.stop();
+        return;
+      }
+
+      window.speechSynthesis?.cancel();
+      const originalText = button.dataset.originalText || button.lastChild.textContent;
+      button.dataset.originalText = originalText;
+      button.disabled = true;
+      button.lastChild.textContent = " 请求权限";
+      try {
+        await ensureMicrophonePermission();
+      } catch {
+        button.disabled = false;
+        button.lastChild.textContent = originalText;
+        showVoiceInputMessage(noticeTarget, "麦克风权限未开启。请在浏览器地址栏允许麦克风，并确认 macOS 系统设置里已允许当前浏览器使用麦克风。");
+        return;
+      }
+
+      const recognition = new Recognition();
+      const captured = [];
+      let lastInterimTranscript = "";
+      recognition.lang = "en-US";
+      recognition.interimResults = true;
+      recognition.continuous = true;
+      recognition.maxAlternatives = 5;
+      button.disabled = false;
+      button.dataset.listening = "true";
+      button.dataset.manualStop = "false";
+      button._recognition = recognition;
+      button.lastChild.textContent = " 停止录音";
+      showVoiceInputMessage(noticeTarget, "正在用 Chrome 语音识别。说完后请点击“停止录音”。", "");
+
+      recognition.onresult = event => {
+        const resultList = Array.from(event.results).slice(event.resultIndex);
+        const finalTranscript = resultList
+          .filter(result => result.isFinal)
+          .map(result => result[0]?.transcript || "")
+          .join(" ")
+          .trim();
+        const interimTranscript = resultList
+          .filter(result => !result.isFinal)
+          .map(result => result[0]?.transcript || "")
+          .join(" ")
+          .trim();
+        if (interimTranscript) lastInterimTranscript = interimTranscript;
+        if (finalTranscript) {
+          captured.push(finalTranscript);
+          lastInterimTranscript = "";
+        }
+      };
+
+      recognition.onerror = event => {
+        if (button.dataset.manualStop !== "true" && ["no-speech", "aborted"].includes(event.error)) return;
+        button.dataset.manualStop = "true";
+        button.dataset.lastSpeechError = event.error || "unknown";
+      };
+
+      recognition.onend = () => {
+        if (button.dataset.manualStop !== "true") {
+          setTimeout(() => {
+            if (button.dataset.listening !== "true") return;
+            try {
+              recognition.start();
+            } catch {
+              button.dataset.manualStop = "true";
+              recognition.stop();
+            }
+          }, 500);
+          return;
+        }
+        resetVoiceInputButton(button, originalText);
+        const text = captured.join(" ") || lastInterimTranscript;
+        if (finishRecognizedText(target, noticeTarget, text, afterResult)) return;
+        const error = button.dataset.lastSpeechError;
+        if (error === "network") {
+          showVoiceInputMessage(noticeTarget, "Chrome 在线语音识别服务连接失败（network）。这通常是网络无法连接 Google 识别服务。");
+        } else {
+          showVoiceInputMessage(noticeTarget, error ? `语音输入已停止（错误码：${error}）。` : "录音已结束，没有识别到内容。", error ? "bad" : "");
+        }
+      };
+
+      try {
+        recognition.start();
+      } catch {
+        resetVoiceInputButton(button, originalText);
+        showVoiceInputMessage(noticeTarget, "Chrome 语音识别启动失败，请刷新页面后再试。");
+      }
+      return true;
+    }
+
+    async function startVoiceInput(target, noticeTarget, button = els.answerMicBtn, afterResult = null) {
+      if (button.dataset.listening === "true" && button._wavRecorder) {
+        button.dataset.manualStop = "true";
+        button._wavRecorder.stopRecording?.();
+        return;
+      }
+
+      const AudioContextConstructor = window.AudioContext || window.webkitAudioContext;
+      if (!AudioContextConstructor || !navigator.mediaDevices?.getUserMedia) {
+        const diagnostics = getVoiceInputDiagnostics();
+        showVoiceInputMessage(noticeTarget, `${diagnostics.browser} 当前不支持网页录音。请用 Microsoft Edge 或 Chrome 打开 http://127.0.0.1:8787 页面。`);
+        return;
+      }
+
+      window.speechSynthesis?.cancel();
+
+      const originalText = button.dataset.originalText || button.lastChild.textContent;
+      button.dataset.originalText = originalText;
+      button.disabled = true;
+      button.lastChild.textContent = " 请求权限";
+      try {
+        await ensureMicrophonePermission();
+      } catch {
+        button.disabled = false;
+        button.lastChild.textContent = originalText;
+        showVoiceInputMessage(noticeTarget, "麦克风权限未开启。请在浏览器地址栏允许麦克风，并确认 macOS 系统设置里已允许 Microsoft Edge 使用麦克风。");
+        return;
+      }
+
+      let recorder;
+      try {
+        recorder = await createWavRecorder();
+      } catch {
+        button.disabled = false;
+        button.lastChild.textContent = originalText;
+        showVoiceInputMessage(noticeTarget, "录音启动失败。请确认浏览器和 macOS 都允许麦克风权限。");
+        return;
+      }
+
+      button.disabled = false;
+      button.dataset.listening = "true";
+      button.dataset.manualStop = "false";
+      button.lastChild.textContent = " 停止录音";
+      const listeningMessage = "正在录音中。说完后请点击“停止录音”，我会把最终内容填入。";
+      showVoiceInputMessage(noticeTarget, listeningMessage, "");
+
+      let stopping = false;
+      const stopRecording = async () => {
+        if (stopping) return;
+        stopping = true;
+        resetVoiceInputButton(button, originalText);
+        button.disabled = true;
+        button.lastChild.textContent = " 正在识别";
+        showVoiceInputMessage(noticeTarget, "录音已结束，正在转写，请稍等。", "");
+        try {
+          const blob = await recorder.stop();
+          if (!blob.size) {
+            showVoiceInputMessage(noticeTarget, "录音已结束，但没有录到音频。请重新录一次。", "");
+            return;
+          }
+          if (!finishRecognizedText(target, noticeTarget, await transcribeRecording(blob), afterResult)) {
+            showVoiceInputMessage(noticeTarget, "转写完成，但没有识别到英文内容。请重新录一次。", "");
+          }
+        } catch (error) {
+          const message = error.message.includes("本地 Whisper 未就绪")
+            ? error.message
+            : `服务端语音识别失败：${error.message}`;
+          showVoiceInputMessage(noticeTarget, message);
+        } finally {
+          button.disabled = false;
+          button.lastChild.textContent = originalText;
+        }
+      };
+
+      button._wavRecorder = { stopRecording };
+    }
+
+    function setResult(message, tone = "") {
+      els.resultBox.className = `result ${tone}`.trim();
+      els.resultBox.innerHTML = message;
+    }
+
+    const meaningStopWords = new Set([
+      "a", "an", "the", "and", "or", "but", "to", "of", "in", "on", "at", "for", "from", "with",
+      "without", "by", "as", "is", "are", "was", "were", "be", "being", "been", "that", "this",
+      "these", "those", "it", "its", "into", "about", "someone", "something", "somebody", "one",
+      "used", "usually", "especially", "often", "also", "very", "more", "most", "such", "than"
+    ]);
+
+    function meaningKeywords(value) {
+      return [...new Set(words(value).filter(word => word.length > 2 && !meaningStopWords.has(word)))];
+    }
+
+    function scoreMeaning(expectedDefinition, answer) {
+      const expected = meaningKeywords(expectedDefinition);
+      const actual = new Set(meaningKeywords(answer));
+      if (!expected.length) return { score: 0, matched: [], missing: [] };
+      const matched = expected.filter(word => actual.has(word));
+      const missing = expected.filter(word => !actual.has(word)).slice(0, 12);
+      const score = Math.round((matched.length / expected.length) * 100);
+      return { score, matched, missing };
+    }
+
+    function isExampleSentence(term, answer) {
+      const normalizedTerm = normalized(term);
+      const normalizedAnswer = normalized(answer);
+      const expandedTerm = expandContractions(term);
+      const expandedAnswer = expandContractions(answer);
+      const answerWords = words(answer);
+      if (answerWords.length < 4) return false;
+      if (normalizedAnswer.includes(normalizedTerm)) return true;
+      if (expandedAnswer.includes(expandedTerm)) return true;
+      const termWords = expandedTerm ? expandedTerm.split(" ") : words(term);
+      if (!termWords.length) return false;
+      const answerSet = new Set(expandedAnswer ? expandedAnswer.split(" ") : answerWords);
+      return termWords.every(word => hasFlexibleWord(answerSet, word));
+    }
+
+    function hasFlexibleWord(answerSet, word) {
+      return wordVariants(word).some(variant => answerSet.has(variant));
+    }
+
+    function wordVariants(word) {
+      if (!word) return [];
+      const variants = new Set([word, toSimpleGerund(word)]);
+      const irregular = {
+        go: ["went", "gone", "going"],
+        lose: ["lost", "losing"],
+        run: ["ran", "running"],
+        slip: ["slipped", "slipping"],
+        scam: ["scammed", "scamming"],
+        shape: ["shaped", "shaping"],
+        set: ["setting"],
+        get: ["got", "getting"],
+        give: ["gave", "given", "giving"]
+      };
+      (irregular[word] || []).forEach(value => variants.add(value));
+      if (word.endsWith("e")) {
+        variants.add(`${word}d`);
+      } else if (word.endsWith("y")) {
+        variants.add(`${word.slice(0, -1)}ied`);
+      } else {
+        variants.add(`${word}ed`);
+      }
+      variants.add(`${word}s`);
+      return [...variants];
+    }
+
+    function toSimpleGerund(word) {
+      if (!word) return "";
+      if (word.endsWith("ie")) return `${word.slice(0, -2)}ying`;
+      if (word.endsWith("e") && word.length > 2) return `${word.slice(0, -1)}ing`;
+      return `${word}ing`;
+    }
+
+    function removeIntroPhraseFromSubject(subject) {
+      return subject
+        .replace(/^(darn it|in addition|however|therefore|for example|for instance|besides|moreover|also|maybe|then|next|first|second|finally)\s+/i, "")
+        .replace(/\b(always|usually|often|sometimes|just|already|still|really)\b/gi, "")
+        .trim();
+    }
+
+    function parseSentenceStructure(sentenceWords, verbWords, auxiliaryQuestionWords) {
+      const politeWords = new Set(["please", "kindly", "just"]);
+      const whWords = new Set(["what", "when", "where", "why", "how", "who", "whom", "which", "whose"]);
+      const firstVerbIndex = sentenceWords.findIndex(word => verbWords.has(word));
+      if (firstVerbIndex < 0) {
+        return { hasVerb: false, isQuestionStructure: false, aux: "", subject: "", verb: "", rest: "" };
+      }
+
+      if (auxiliaryQuestionWords.has(sentenceWords[0]) && sentenceWords.length >= 3) {
+        const subject = sentenceWords[1] || "";
+        let verbIndex = 2;
+        while (verbIndex < sentenceWords.length && politeWords.has(sentenceWords[verbIndex])) {
+          verbIndex += 1;
+        }
+        const verb = sentenceWords[verbIndex] || sentenceWords[0];
+        return {
+          hasVerb: true,
+          isQuestionStructure: true,
+          aux: sentenceWords[0],
+          subject,
+          verb,
+          rest: sentenceWords.slice(verbIndex + 1).join(" ")
+        };
+      }
+
+      if (whWords.has(sentenceWords[0]) && auxiliaryQuestionWords.has(sentenceWords[1]) && sentenceWords.length >= 3) {
+        return {
+          hasVerb: true,
+          isQuestionStructure: true,
+          aux: sentenceWords[1],
+          subject: sentenceWords.slice(2).join(" "),
+          verb: sentenceWords[1],
+          rest: ""
+        };
+      }
+
+      const rawSubject = sentenceWords.slice(0, firstVerbIndex).join(" ");
+      return {
+        hasVerb: true,
+        isQuestionStructure: false,
+        aux: "",
+        subject: removeIntroPhraseFromSubject(rawSubject),
+        verb: sentenceWords[firstVerbIndex],
+        rest: sentenceWords.slice(firstVerbIndex + 1).join(" ")
+      };
+    }
+
+    function analyzeSentence(term, sentence) {
+      const text = sentence.trim();
+      const lower = normalized(text);
+      const sentenceWords = words(text);
+      const usesTerm = isExampleSentence(term, text);
+      const issues = [];
+      const naturalTips = [];
+      const verbWords = new Set([
+        "am", "is", "are", "was", "were", "be", "been", "being", "do", "does", "did",
+        "have", "has", "had", "go", "goes", "went", "make", "makes", "made", "take",
+        "takes", "took", "get", "gets", "got", "use", "uses", "used", "like", "likes",
+        "liked", "need", "needs", "needed", "want", "wants", "wanted", "feel", "feels",
+        "felt", "see", "sees", "saw", "say", "says", "said", "help", "helps", "helped",
+        "work", "works", "worked", "study", "studies", "studied", "learn", "learns",
+        "learned", "think", "thinks", "thought", "know", "knows", "knew", "commute",
+        "commutes", "commuted", "commuting", "borrow", "borrows", "borrowed", "borrowing",
+        "focus", "focuses", "focused", "focusing", "suppose", "supposes", "supposed", "supposing",
+        "plan", "plans", "planned", "planning",
+        "set", "sets", "setting", "look", "looks", "looked", "looking", "miss", "misses",
+        "missed", "missing", "practice", "practices", "practiced", "practicing",
+        "run", "runs", "ran", "running", "shape", "shapes", "shaped", "shaping",
+        "slip", "slips", "slipped", "slipping", "scam", "scams", "scammed", "scamming",
+        "lose", "loses", "lost", "losing", "exercise", "exercises", "exercised", "exercising",
+        "give", "gives", "gave", "given", "giving",
+        "can", "could",
+        "will", "would", "should", "may", "might", "must"
+      ]);
+      const auxiliaryQuestionWords = new Set([
+        "am", "is", "are", "was", "were", "do", "does", "did", "have", "has", "had",
+        "can", "could", "will", "would", "should", "may", "might", "must"
+      ]);
+      const structureInfo = parseSentenceStructure(sentenceWords, verbWords, auxiliaryQuestionWords);
+      const { hasVerb, isQuestionStructure, aux, subject, verb, rest } = structureInfo;
+      const acceptableFragment = usesTerm && !hasVerb && sentenceWords.length >= 3;
+
+      if (sentenceWords.length < 4) issues.push("句子太短，建议写成完整句。");
+      if (!usesTerm) issues.push("句子里没有清楚用到这个单词或词组。");
+      if (!hasVerb && !acceptableFragment) issues.push("没有识别到明确谓语动词，句子结构可能不完整。");
+      if (hasVerb && !subject) issues.push("谓语前缺少明显主语。");
+      if (/^i\s+am\s+agree\b/.test(lower)) issues.push("agree 不说 “I am agree”，应说 “I agree”。");
+      if (/\bvery\s+like\b/.test(lower)) issues.push("very 不能直接修饰 like。");
+      if (/\bmore\s+better\b/.test(lower)) issues.push("better 已经是比较级，不要说 more better。");
+      if (/\bmake\s+a\s+nap\b/.test(lower)) issues.push("nap 常搭配 take/have，不说 make a nap。");
+      if (/^[a-z]/.test(text)) naturalTips.push("句首建议大写。");
+      if (!/[.!?]$/.test(text)) naturalTips.push("句末建议加句号、问号或感叹号。");
+      if (/\bI\s+very\s+like\b/i.test(text)) naturalTips.push("更自然：I really like ...");
+      if (/\btake\s+a\s+nap\b/i.test(text) && !/\bquick|short|after lunch|for a while\b/i.test(text)) {
+        naturalTips.push("take a nap 很自然；如果想更地道，可以写 take a quick nap 或 take a short nap。");
+      }
+
+      const structure = hasVerb
+        ? `${isQuestionStructure ? `助动词：${aux}；` : ""}主语：${subject || "未明确"}；谓语：${verb}；其余部分：${rest || "无"}`
+        : acceptableFragment
+          ? `省略句/短语句：${sentenceWords.join(" ")}`
+        : "暂未识别到清楚的主语 + 谓语结构。";
+      const grammarOk = issues.length === 0;
+      const naturalOk = naturalTips.length === 0;
+      const improved = grammarOk && naturalOk
+        ? ""
+        : buildNaturalSuggestion(term, text, issues, naturalTips);
+
+      return { usesTerm, grammarOk, naturalOk, issues, naturalTips, structure, improved };
+    }
+
+    function buildNaturalSuggestion(term, sentence, issues, naturalTips) {
+      const lower = normalized(sentence);
+      if (/\bI\s+very\s+like\b/i.test(sentence)) {
+        return sentence.replace(/\bI\s+very\s+like\b/i, "I really like");
+      }
+      if (/\bmake\s+a\s+nap\b/.test(lower)) {
+        return sentence.replace(/make\s+a\s+nap/i, "take a nap");
+      }
+      if (!isExampleSentence(term, sentence)) {
+        return "";
+      }
+      return "";
+    }
+
+    function cleanSpokenTerm(value) {
+      return value
+        .toLowerCase()
+        .replace(/[^a-z0-9'\s-]/g, " ")
+        .replace(/\s+/g, " ")
+        .trim();
+    }
+
+    function uniqueTerms(values) {
+      return [...new Set(values.map(cleanSpokenTerm).filter(Boolean))];
+    }
+
+    async function fetchWithTimeout(url, options = {}, timeoutMs = 5000) {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), timeoutMs);
+      try {
+        return await fetch(url, { ...options, signal: controller.signal });
+      } catch (error) {
+        const reason = error?.name === "AbortError" ? "timeout" : "network";
+        const wrapped = new Error(reason);
+        wrapped.reason = reason;
+        throw wrapped;
+      } finally {
+        clearTimeout(timeout);
+      }
+    }
+
+    function isDictionaryLookupUnavailable(error) {
+      return error?.reason === "timeout" || error?.reason === "network";
+    }
+
+    async function lookupDefinition(term) {
+      const query = encodeURIComponent(term.toLowerCase().trim());
+      const response = await fetchWithTimeout(`https://api.dictionaryapi.dev/api/v2/entries/en/${query}`, {}, 5000);
+      if (!response.ok) throw new Error("not-found");
+      const entries = await response.json();
+      const meanings = entries.flatMap(entry => entry.meanings || []);
+      const definitions = meanings
+        .flatMap(meaning => (meaning.definitions || []).map(def => ({
+          partOfSpeech: meaning.partOfSpeech || "",
+          definition: def.definition || "",
+          example: def.example || ""
+        })))
+        .filter(item => item.definition);
+      if (!definitions.length) throw new Error("not-found");
+      const picked = definitions.slice(0, 3).map(item => {
+        const label = item.partOfSpeech ? `${item.partOfSpeech}: ` : "";
+        const example = item.example ? ` Example: ${item.example}` : "";
+        return `${label}${item.definition}${example}`;
+      });
+      return picked.join("\n");
+    }
+
+    async function suggestEnglishTerms(term) {
+      const response = await fetchWithTimeout(`https://api.datamuse.com/sug?s=${encodeURIComponent(term)}&max=8`, {}, 3500);
+      if (!response.ok) return [];
+      const suggestions = await response.json();
+      return uniqueTerms(suggestions.map(item => item.word || ""));
+    }
+
+    async function validatePhraseWords(term) {
+      const smallWords = new Set([
+        "a", "an", "the", "to", "of", "in", "on", "at", "for", "and", "or", "but", "with",
+        "without", "by", "from", "into", "about", "as", "than", "that", "this", "these",
+        "those", "my", "your", "his", "her", "its", "our", "their", "me", "you", "him",
+        "she", "he", "it", "we", "they", "i", "am", "is", "are", "was", "were", "be",
+        "been", "being", "do", "does", "did", "can", "could", "will", "would", "should",
+        "may", "might", "must", "not", "too", "so", "just", "very", "really", "quite"
+      ]);
+      const contractionWords = new Set([
+        "how's", "what's", "where's", "when's", "who's", "why's", "it's", "that's",
+        "there's", "here's", "he's", "she's", "i'm", "you're", "we're", "they're",
+        "i've", "you've", "we've", "they've", "i'll", "you'll", "we'll", "they'll",
+        "don't", "doesn't", "didn't", "can't", "couldn't", "won't", "wouldn't",
+        "shouldn't", "isn't", "aren't", "wasn't", "weren't", "haven't", "hasn't", "hadn't"
+      ]);
+      const parts = words(term).filter(word => !smallWords.has(word) && !contractionWords.has(word));
+      const checked = [];
+      for (const part of parts) {
+        try {
+          await lookupDefinition(part);
+          checked.push({ word: part, ok: true, suggestions: [] });
+        } catch {
+          let suggestions = [];
+          try {
+            suggestions = await suggestEnglishTerms(part);
+          } catch {
+            suggestions = [];
+          }
+          checked.push({ word: part, ok: false, suggestions });
+        }
+      }
+      return checked;
+    }
+
+    async function resolveSpokenTerm(transcript, alternatives = []) {
+      const baseCandidates = uniqueTerms([
+        transcript,
+        ...alternatives,
+        cleanSpokenTerm(transcript).replace(/\s+/g, "-"),
+        cleanSpokenTerm(transcript).replace(/-/g, " ")
+      ]);
+      const tested = new Set();
+      const valid = [];
+
+      async function testTerm(term, source) {
+        const cleaned = cleanSpokenTerm(term);
+        if (!cleaned || tested.has(cleaned)) return;
+        tested.add(cleaned);
+        try {
+          const definition = await lookupDefinition(cleaned);
+          valid.push({ term: cleaned, definition, source });
+        } catch {
+          // Keep looking for a real dictionary-backed candidate.
+        }
+      }
+
+      for (const candidate of baseCandidates) {
+        await testTerm(candidate, "语音候选");
+      }
+
+      if (!valid.length) {
+        const suggestionGroups = await Promise.all(baseCandidates.slice(0, 4).map(suggestEnglishTerms));
+        for (const suggestion of uniqueTerms(suggestionGroups.flat()).slice(0, 12)) {
+          await testTerm(suggestion, "英文词库推测");
+          if (valid.length >= 3) break;
+        }
+      }
+
+      return valid;
+    }
+
+    function getItemWeight(item) {
+      const correct = Number(item.correct || 0);
+      const reviews = Number(item.reviews || 0);
+      const lastScore = Number.isFinite(Number(item.lastScore)) ? Number(item.lastScore) : 0;
+      const lowScoreBoost = Math.max(0, 100 - lastScore) / 25;
+      const newItemBoost = reviews ? 0 : 5;
+      const dueBoost = !item.nextReviewAt || new Date(item.nextReviewAt).getTime() <= Date.now() ? 8 : 0;
+      return 1 + dueBoost + newItemBoost + lowScoreBoost + (8 / (correct + 1));
+    }
+
+    function pickWeightedItems(items, count) {
+      const pool = [...items];
+      const picked = [];
+      while (pool.length && picked.length < count) {
+        const totalWeight = pool.reduce((sum, item) => sum + getItemWeight(item), 0);
+        let cursor = Math.random() * totalWeight;
+        const index = pool.findIndex(item => {
+          cursor -= getItemWeight(item);
+          return cursor <= 0;
+        });
+        picked.push(pool.splice(index >= 0 ? index : pool.length - 1, 1)[0]);
+      }
+      return picked;
+    }
+
+    function shuffleItems(items) {
+      const result = [...items];
+      for (let index = result.length - 1; index > 0; index -= 1) {
+        const swapIndex = Math.floor(Math.random() * (index + 1));
+        [result[index], result[swapIndex]] = [result[swapIndex], result[index]];
+      }
+      return result;
+    }
+
+    function pickPrioritizedItems(items, count) {
+      const reviewableItems = getReviewableItems(items);
+      const freshItems = reviewableItems.filter(item => Number(item.reviews || 0) === 0);
+      const reviewedItems = reviewableItems.filter(item => Number(item.reviews || 0) > 0);
+      const freshTarget = Math.ceil(count / 2);
+      const reviewedTarget = count - freshTarget;
+      const pickedFresh = pickWeightedItems(freshItems, Math.min(freshTarget, freshItems.length));
+      const pickedReviewed = pickWeightedItems(reviewedItems, Math.min(reviewedTarget, reviewedItems.length));
+      const pickedIds = new Set([...pickedFresh, ...pickedReviewed].map(item => item.id));
+      const remaining = reviewableItems.filter(item => !pickedIds.has(item.id));
+      const filled = [
+        ...pickedFresh,
+        ...pickedReviewed,
+        ...pickWeightedItems(remaining, count - pickedFresh.length - pickedReviewed.length)
+      ];
+      return shuffleItems(filled);
+    }
+
+    function startRound() {
+      stopRepeatPlayback();
+      const reviewableItems = getReviewableItems();
+      if (!reviewableItems.length) {
+        state.currentId = null;
+        state.roundIds = [];
+        state.roundIndex = 0;
+        renderPrompt();
+        setResult(state.items.length ? "当前没有可复习内容。今天录入的新词会从明天开始复习；完全掌握的内容也不会再调出。" : "先添加第一条英文材料，再开始练习。", "good");
+        return;
+      }
+      const requested = Math.max(1, Math.min(Number(els.roundSizeInput.value) || 1, reviewableItems.length));
+      els.roundSizeInput.value = requested;
+      state.roundIds = pickPrioritizedItems(reviewableItems, requested).map(item => item.id);
+      state.roundIndex = 0;
+      state.currentId = state.roundIds[0];
+      startSpellingStep();
+      els.answerInput.value = "";
+      setResult(`本轮开始：${getRoundPosition()}。请听声音后写出单词或词组。`, "");
+      renderPrompt();
+      const item = getCurrentItem();
+      if (item) speak(item.title);
+    }
+
+    function startDueRound() {
+      stopRepeatPlayback();
+      const dueItems = getDueItems();
+      if (!dueItems.length) {
+        setResult("目前没有到期且未完全掌握的内容。可以稍后再复习，或先添加新材料。", "good");
+        return;
+      }
+      const requested = Math.max(1, Math.min(Number(els.roundSizeInput.value) || 1, dueItems.length));
+      els.roundSizeInput.value = requested;
+      const picked = pickPrioritizedItems(dueItems, requested);
+      state.roundIds = picked.map(item => item.id);
+      state.roundIndex = 0;
+      state.currentId = state.roundIds[0];
+      startSpellingStep();
+      els.answerInput.value = "";
+      const freshCount = picked.filter(item => Number(item.reviews || 0) === 0).length;
+      setResult(`开始到期复习：${getRoundPosition()}。优先安排 ${freshCount} 条从未复习过的内容。`, "");
+      renderPrompt();
+      const item = getCurrentItem();
+      if (item) speak(item.title);
+    }
+
+    function nextItem() {
+      stopRepeatPlayback();
+      if (!state.roundIds.length) {
+        startDueRound();
+        return;
+      }
+      if (state.roundIndex >= state.roundIds.length - 1) {
+        state.currentId = null;
+        state.roundIds = [];
+        state.roundIndex = 0;
+        els.answerInput.value = "";
+        renderPrompt();
+        setResult("本轮完成。准备好后可以再开始一轮。", "good");
+        return;
+      }
+      state.roundIndex += 1;
+      state.currentId = state.roundIds[state.roundIndex];
+      startSpellingStep();
+      els.answerInput.value = "";
+      setResult(`进入下一条：${getRoundPosition()}。请听声音后写出单词或词组。`, "");
+      renderPrompt();
+      const item = getCurrentItem();
+      if (item) speak(item.title);
+    }
+
+    function renderPrompt() {
+      const item = getCurrentItem();
+      if (!item) {
+        els.promptBox.className = "prompt empty";
+        els.promptBox.innerHTML = `
+          <div>
+            <div class="prompt-label">准备好了</div>
+            <p>先添加几条英文材料，再开始随机听写练习。</p>
+          </div>`;
+        return;
+      }
+      const sentenceStep = state.reviewStep === "sentence";
+      els.promptBox.className = "prompt";
+      els.promptBox.innerHTML = `
+        <div class="prompt-head">
+          <div class="prompt-label">${sentenceStep ? "造句中" : "听写中"}</div>
+          <button class="mini" data-play-current="single" type="button">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4V5ZM15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            单次播放
+          </button>
+          <button class="mini" data-play-current="repeat" type="button">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4V5ZM15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            重复播放
+          </button>
+        </div>
+        <div>
+          <strong>${sentenceStep ? `请用 “${escapeHtml(item.title)}” 造一个英文句子` : "请听声音后写出单词或词组"}</strong>
+          <p class="hint">${escapeHtml(getRoundPosition() || "单条练习")} · 熟练答对 ${Number(item.correct || 0)} 次 · 复习 ${Number(item.reviews || 0)} 次 · ${sentenceStep ? "造句完成后，这条复习才会结束。" : "检查后进入造句环节。"}</p>
+          ${sentenceStep ? "" : `
+            <div class="mini-actions">
+              <button class="mini" data-reveal-current="true" type="button">展示内容，进入造句</button>
+              <button class="mini" data-reveal-skip-sentence="true" type="button">展示内容，下一条</button>
+            </div>`}
+        </div>`;
+    }
+
+    function getNextRoundText() {
+      if (!state.roundIds.length) return "";
+      const isLast = state.roundIndex >= state.roundIds.length - 1;
+      return isLast ? "这是本轮最后一条。" : "点击“下一条”继续练习。";
+    }
+
+    function getNextRoundAction() {
+      if (!state.roundIds.length) return "";
+      const isLast = state.roundIndex >= state.roundIds.length - 1;
+      if (isLast) return `<p>这是本轮最后一条。</p>`;
+      return `
+        <div class="mini-actions">
+          <button class="mini" data-result-next="true" type="button">下一条</button>
+        </div>
+      `;
+    }
+
+    function recordReviewResult(item, remembered, score) {
+      item.reviews = (item.reviews || 0) + 1;
+      item.correct = (item.correct || 0) + (remembered ? 1 : 0);
+      item.lastScore = score;
+      item.lastReviewedAt = new Date().toISOString();
+      scheduleNextReview(item, remembered);
+      state.pendingJudgement = null;
+      state.currentReview = null;
+      state.reviewStep = "spelling";
+      persist();
+      renderAll();
+    }
+
+    async function getReviewDefinition(item) {
+      return lookupDefinition(item.title);
+    }
+
+    function spellingMatches(expected, answer) {
+      return normalized(expected) === normalized(answer) || expandContractions(expected) === expandContractions(answer);
+    }
+
+    function findDuplicateItem(title, ignoredId = null) {
+      const target = normalized(title);
+      return state.items.find(item => item.id !== ignoredId && normalized(item.title) === target) || null;
+    }
+
+    function startSpellingStep() {
+      state.reviewStep = "spelling";
+      state.pendingJudgement = null;
+      state.currentReview = null;
+      els.answerInput.placeholder = "听到后写出单词或词组...";
+    }
+
+    function startSentenceStep(spellingCorrect, spellingAnswer, revealed = false) {
+      const item = getCurrentItem();
+      if (!item) return;
+      state.reviewStep = "sentence";
+      state.pendingJudgement = null;
+      state.currentReview = {
+        itemId: item.id,
+        spellingCorrect,
+        spellingAnswer,
+        revealed
+      };
+      els.answerInput.value = "";
+      els.answerInput.placeholder = `用 ${item.title} 造一个英文句子...`;
+      renderPrompt();
+      setResult(`
+        <strong>${spellingCorrect ? "拼写正确，进入造句环节。" : "已显示正确拼写，继续造句。"}</strong>
+        <p><strong>正确拼写：</strong> ${escapeHtml(item.title)}</p>
+        ${spellingAnswer ? `<p><strong>你的听写：</strong> ${escapeHtml(spellingAnswer)}</p>` : ""}
+        <p>请用这个词或词组造一个英文句子，然后点击“检查”。</p>
+      `, spellingCorrect ? "good" : "bad");
+    }
+
+    function completeSentenceStep(item, sentence, score) {
+      const spellingCorrect = Boolean(state.currentReview?.spellingCorrect);
+      const analysis = analyzeSentence(item.title, sentence);
+      const sentenceGood = analysis.grammarOk && analysis.usesTerm;
+      const spellingAnswer = state.currentReview?.spellingAnswer || "";
+      state.pendingJudgement = {
+        itemId: item.id,
+        mode: "final",
+        score: spellingCorrect && sentenceGood ? 100 : 40,
+        spellingCorrect,
+        sentenceGood,
+        spellingAnswer,
+        sentence,
+        analysis
+      };
+      setResult(`
+        <strong>造句已完成，请你判断这条是否需要复习。</strong>
+        <p><strong>正确拼写：</strong> ${escapeHtml(item.title)}</p>
+        ${spellingAnswer ? `<p><strong>你的听写：</strong> ${escapeHtml(spellingAnswer)}（${spellingCorrect ? "拼写正确" : "拼写有误"}）</p>` : ""}
+        <p><strong>你的句子：</strong> ${escapeHtml(sentence)}</p>
+        <p><strong>拼写判断：</strong> ${spellingCorrect ? "答对了" : "答错了 / 主动展示了答案"}</p>
+        <p><strong>句子结构：</strong> ${escapeHtml(analysis.structure)}</p>
+        <p><strong>语法判断：</strong> ${analysis.grammarOk ? "没有发现明显语法问题。" : analysis.issues.map(escapeHtml).join("；")}</p>
+        <p><strong>地道程度：</strong> ${analysis.naturalOk ? "表达自然，暂时不需要修改。" : analysis.naturalTips.map(escapeHtml).join("；")}</p>
+        ${analysis.improved ? `<p><strong>更地道表达：</strong> ${escapeHtml(analysis.improved)}</p>` : ""}
+        <div class="mini-actions">
+          <button class="mini" data-final-judge="remembered" type="button">记为掌握</button>
+          <button class="mini" data-final-judge="review" type="button">需要复习</button>
+        </div>
+      `, sentenceGood ? "good" : "bad");
+    }
+
+    function completeSkippedSentenceStep(item, spellingAnswer) {
+      state.pendingJudgement = {
+        itemId: item.id,
+        mode: "final",
+        score: 40,
+        spellingCorrect: false,
+        sentenceGood: false,
+        spellingAnswer,
+        sentence: "",
+        skippedSentence: true,
+        analysis: null
+      };
+      setResult(`
+        <strong>已显示正确内容，请你判断这条是否需要复习。</strong>
+        <p><strong>正确拼写：</strong> ${escapeHtml(item.title)}</p>
+        <p><strong>听写状态：</strong> 主动展示内容，听写记为未通过。</p>
+        <p><strong>造句状态：</strong> 已跳过造句。</p>
+        <div class="mini-actions">
+          <button class="mini" data-final-judge="remembered" type="button">记为掌握</button>
+          <button class="mini" data-final-judge="review" type="button">需要复习</button>
+        </div>
+      `, "bad");
+    }
+
+    async function checkAnswer() {
+      const item = getCurrentItem();
+      if (!item) {
+        setResult("请先开始一轮随机练习。", "bad");
+        return;
+      }
+      const answer = els.answerInput.value.trim();
+      if (!answer) {
+        setResult("请先写出你听到的单词或词组。", "bad");
+        return;
+      }
+      if (!isEnglishOnly(els.answerInput.value)) {
+        setResult("答案只能输入英文。", "bad");
+        return;
+      }
+
+      if (state.reviewStep === "sentence") {
+        if (!state.currentReview || state.currentReview.itemId !== item.id) {
+          startSentenceStep(false, "");
+          return;
+        }
+        const sentence = answer;
+        const sentenceUsesTerm = isExampleSentence(item.title, sentence);
+        const score = sentenceUsesTerm ? 100 : 40;
+        completeSentenceStep(item, sentence, score);
+        return;
+      }
+
+      if (spellingMatches(item.title, answer)) {
+        startSentenceStep(true, answer);
+        return;
+      }
+
+      state.pendingJudgement = {
+        itemId: item.id,
+        score: 0,
+        answer,
+        mode: "spelling"
+      };
+
+      setResult(`
+        <strong>拼写还不对</strong>
+        <p><strong>你的答案：</strong> ${escapeHtml(answer)}</p>
+        <p>要现在显示正确拼写吗？显示后听写会记为未通过，但仍会进入造句环节。</p>
+        <div class="mini-actions">
+          <button class="mini" data-spelling-action="show" type="button">显示正确拼写</button>
+          <button class="mini" data-spelling-action="retry" type="button">再试一次</button>
+        </div>
+      `, "bad");
+    }
+
+    async function previewDefinitionFromDictionary() {
+      const title = els.titleInput.value.trim();
+      if (!title) {
+        setNotice("请先输入英文单词或词组。", "error");
+        return { ok: false, canSave: false, message: "请先输入英文单词或词组。" };
+      }
+      if (!isEnglishOnly(title)) {
+        setNotice("单词或词组只能输入英文。", "error");
+        return { ok: false, canSave: false, message: "单词或词组只能输入英文。" };
+      }
+      setNotice("正在校验英文词条...", "");
+      els.saveBtn.disabled = true;
+      try {
+        if (shouldSkipOnlineDictionaryCheck(title)) {
+          setNotice("基础英文内容已通过本地校验，可以保存。", "ok");
+          return { ok: true, canSave: true, message: "本地校验通过。" };
+        }
+        const definition = await lookupDefinition(title);
+        setNotice("校验通过，可以保存。", "ok");
+        return { ok: true, canSave: true, message: "校验通过。" };
+      } catch (error) {
+        if (isDictionaryLookupUnavailable(error)) {
+          setNotice("在线词典校验超时，已跳过校验并继续保存。", "warn");
+          return {
+            ok: true,
+            canSave: true,
+            skippedOnlineValidation: true,
+            message: "在线词典校验超时，已跳过校验。"
+          };
+        }
+        const isPhrase = words(title).length > 1;
+        if (isPhrase) {
+          const checkedWords = await validatePhraseWords(title);
+          const badWords = checkedWords.filter(item => !item.ok);
+          if (badWords.length) {
+            const details = badWords
+              .map(item => {
+                const suggestions = item.suggestions.length ? `，可能是：${item.suggestions.slice(0, 5).join(", ")}` : "";
+                return `${item.word}${suggestions}`;
+              })
+              .join("\n");
+            setNotice("词组里有单词可能拼错，请确认。", "error");
+            return {
+              ok: false,
+              canSave: true,
+              needsConfirm: true,
+              message: `发现下面这些单词可能有拼写问题：\n${details}\n\n如果你确认原文没问题，仍然可以保存到词库。是否继续保存？`
+            };
+          }
+          setNotice("词组整体未收录，但核心单词校验通过，已允许保存。", "ok");
+          return {
+            ok: true,
+            canSave: true,
+            message: "核心单词校验通过。"
+          };
+        }
+        let suggestions = [];
+        try {
+          suggestions = await suggestEnglishTerms(title);
+        } catch {
+          suggestions = [];
+        }
+        const suggestionText = suggestions.length ? `\n可能相近：${suggestions.slice(0, 5).join(", ")}` : "";
+        setNotice("没有查到这个词条，请确认拼写。", "error");
+        return {
+          ok: false,
+          canSave: true,
+          needsConfirm: true,
+          message: `没有查到单词 “${title}”，可能是拼写有误。${suggestionText}\n\n仍然添加到词库吗？`
+        };
+      } finally {
+        els.saveBtn.disabled = false;
+      }
+    }
+
+    async function saveItem() {
+      const title = els.titleInput.value.trim();
+
+      if (!title) {
+        setNotice("请先输入英文单词或词组。", "error");
+        return;
+      }
+      if (!isEnglishOnly(title)) {
+        setNotice("单词或词组只能输入英文。", "error");
+        return;
+      }
+
+      const validation = await previewDefinitionFromDictionary();
+      if (!validation.canSave) return;
+      if (validation.needsConfirm && !confirm(validation.message)) {
+        setNotice("已取消保存。请修改词条后再试。", "error");
+        return;
+      }
+
+      if (state.editingId) {
+        const duplicate = findDuplicateItem(title, state.editingId);
+        if (duplicate) {
+          setNotice(`词库里已经有 “${duplicate.title}”，不会重复保存。`, "error");
+          return;
+        }
+        const item = state.items.find(entry => entry.id === state.editingId);
+        if (item) {
+          item.title = title;
+          delete item.content;
+          delete item.definitionSource;
+          item.updatedAt = new Date().toISOString();
+        }
+        state.editingId = null;
+        els.saveBtn.lastChild.textContent = " 校验并保存";
+        setNotice("已更新词条。", "ok");
+      } else {
+        const duplicate = findDuplicateItem(title);
+        if (duplicate) {
+          setNotice(`词库里已经有 “${duplicate.title}”，不会重复添加。`, "error");
+          return;
+        }
+        state.items.unshift({
+          id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now()),
+          title,
+          reviews: 0,
+          correct: 0,
+          memoryStage: 0,
+          nextReviewAt: getTomorrowStartIso(),
+          createdAt: new Date().toISOString()
+        });
+        setNotice("已保存词条。后续会用于听写和造句复习。", "ok");
+      }
+
+      els.titleInput.value = "";
+      persist();
+      renderAll();
+    }
+
+    function setNotice(message, tone = "") {
+      els.formNotice.className = `notice ${tone}`.trim();
+      els.formNotice.textContent = message;
+    }
+
+    function renderStats() {
+      const totalReviews = state.items.reduce((sum, item) => sum + (item.reviews || 0), 0);
+      const totalCorrect = state.items.reduce((sum, item) => sum + (item.correct || 0), 0);
+      const reviewedItems = state.items.filter(item => Number(item.reviews || 0) > 0).length;
+      const masteredItems = state.items.filter(item => Number(item.correct || 0) >= 5).length;
+      els.totalCount.textContent = state.items.length;
+      els.reviewedItemCount.textContent = reviewedItems;
+      els.masteredCount.textContent = masteredItems;
+      els.reviewedCount.textContent = totalReviews;
+      els.accuracyCount.textContent = totalReviews ? `${Math.round((totalCorrect / totalReviews) * 100)}%` : "0%";
+      els.dueCount.textContent = getDueItems().length;
+    }
+
+    function renderList() {
+      if (!state.items.length) {
+        els.itemList.innerHTML = `<p class="hint">还没有材料。</p>`;
+        return;
+      }
+
+      const query = normalized(els.librarySearchInput.value || "");
+      let visibleItems = state.items;
+      if (state.libraryFilter === "reviewed") {
+        visibleItems = visibleItems.filter(item => Number(item.reviews || 0) > 0);
+      } else if (state.libraryFilter === "mastered") {
+        visibleItems = visibleItems.filter(item => Number(item.correct || 0) >= 5);
+      } else if (state.libraryFilter === "correct") {
+        visibleItems = visibleItems.filter(item => Number(item.correct || 0) > 0);
+      } else if (state.libraryFilter === "due") {
+        const dueIds = new Set(getDueItems().map(item => item.id));
+        visibleItems = visibleItems.filter(item => dueIds.has(item.id));
+      }
+      if (query) {
+        visibleItems = visibleItems.filter(item => normalized(item.title).includes(query));
+      }
+
+      if (!visibleItems.length) {
+        const emptyText = getLibraryEmptyText();
+        els.itemList.innerHTML = `<p class="hint">${emptyText}</p>`;
+        return;
+      }
+
+      const filterNotice = state.libraryFilter !== "all"
+        ? `<p class="hint">正在查看${getLibraryFilterLabel()}。点击“词库”可回到全部内容。</p>`
+        : "";
+      els.itemList.innerHTML = filterNotice + visibleItems.map(item => `
+        <article class="card">
+          <div class="card-title">
+            <span>${escapeHtml(item.title)}</span>
+            <span class="hint card-stats">
+              <span>答对 ${Number(item.correct || 0)} 次</span>
+              <span>复习 ${Number(item.reviews || 0)} 次</span>
+            </span>
+          </div>
+          ${Number(item.correct || 0) >= 5 ? `<p>状态：完全掌握</p>` : ""}
+          <div class="card-footer">
+            <div class="mini-actions">
+              <button class="mini" data-action="play" data-id="${item.id}" type="button">播放</button>
+              <button class="mini" data-action="edit" data-id="${item.id}" type="button">编辑</button>
+              <button class="mini" data-action="delete" data-id="${item.id}" type="button">删除</button>
+            </div>
+            <span class="entry-date">录入 ${escapeHtml(formatEntryDate(item.createdAt))}</span>
+          </div>
+        </article>
+      `).join("");
+    }
+
+    function getLibraryFilterLabel() {
+      const labels = {
+        reviewed: "已复习内容",
+        mastered: "完全掌握内容",
+        correct: "答对过的内容",
+        due: "到期复习内容"
+      };
+      return labels[state.libraryFilter] || "全部内容";
+    }
+
+    function getLibraryEmptyText() {
+      const texts = {
+        reviewed: "还没有已复习的内容。",
+        mastered: "还没有完全掌握的内容。",
+        correct: "还没有答对过的内容。",
+        due: "当前没有到期复习的内容。"
+      };
+      return texts[state.libraryFilter] || "没有找到匹配内容。";
+    }
+
+    function renderVoices() {
+      const americanVoices = "speechSynthesis" in window
+        ? window.speechSynthesis.getVoices()
+          .filter(voice => /^en[-_]US$/i.test(voice.lang) && guessVoiceGenderLabel(voice) !== "性别未知")
+        : [];
+      const onlineBrowserVoices = pickPreferredAmericanVoices(americanVoices.filter(voice =>
+        voice.localService === false || voice.name.toLowerCase().includes("online")
+      ));
+      const localBrowserVoices = pickPreferredAmericanVoices(americanVoices.filter(voice =>
+        voice.localService !== false && !voice.name.toLowerCase().includes("online")
+      ));
+      state.browserVoices = [...onlineBrowserVoices, ...localBrowserVoices];
+      state.voices = [
+        ...(state.azureTtsConfigured ? ONLINE_TTS_VOICES : []),
+        ...state.browserVoices
+      ];
+      if (!state.voices.length && "speechSynthesis" in window) {
+        state.voices = [{ name: "browser-default", label: "浏览器默认美式声音", lang: "en-US", defaultBrowserVoice: true }];
+      }
+      const options = state.voices;
+      if (!options.length) {
+        els.voiceSelect.innerHTML = `<option value="">未配置在线美式语音</option>`;
+        state.settings.voiceName = "";
+        persistSettings();
+        return;
+      }
+      els.voiceSelect.innerHTML = options.map(voice => {
+        if (voice.onlineTts) {
+          return `<option value="${escapeHtml(voice.name)}">${escapeHtml(voice.label)} (${escapeHtml(voice.lang)})</option>`;
+        }
+        if (voice.defaultBrowserVoice) {
+          return `<option value="${voice.name}">${voice.label} (${voice.lang})</option>`;
+        }
+        const gender = guessVoiceGenderLabel(voice);
+        const source = voice.localService ? "本机" : "Edge 在线";
+        const natural = voice.name.toLowerCase().includes("natural") ? "自然" : "";
+        return `<option value="${escapeHtml(voice.name)}">${escapeHtml(voice.name)} · ${source}${natural} · ${gender} (${escapeHtml(voice.lang)})</option>`;
+      }).join("");
+      const savedVoice = options.find(voice => voice.name === state.settings.voiceName);
+      if (savedVoice) {
+        els.voiceSelect.value = savedVoice.name;
+        state.nextSpeechVoiceIndex = Math.max(0, options.findIndex(voice => voice.name === savedVoice.name));
+      } else {
+        state.settings.voiceName = options[0].name;
+        els.voiceSelect.value = options[0].name;
+        state.nextSpeechVoiceIndex = 0;
+        persistSettings();
+      }
+    }
+
+    async function loadTtsStatus() {
+      try {
+        const response = await fetch("/api/tts/status", { cache: "no-store" });
+        if (!response.ok) return;
+        const status = await response.json();
+        state.azureTtsConfigured = Boolean(status.configured);
+      } catch {
+        state.azureTtsConfigured = false;
+      }
+    }
+
+    function renderAll() {
+      renderStats();
+      renderList();
+      renderPrompt();
+    }
+
+    function switchPane(target) {
+      const library = target === "library";
+      els.addTab.classList.toggle("active", !library);
+      els.libraryTab.classList.toggle("active", library);
+      els.addPane.classList.toggle("hidden", library);
+      els.libraryPane.classList.toggle("hidden", !library);
+    }
+
+    function exportItems() {
+      const blob = new Blob([JSON.stringify(state.items, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `english-dictation-review-${new Date().toISOString().slice(0, 10)}.json`;
+      link.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function importItems(file) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          const data = JSON.parse(String(reader.result));
+          const clean = cleanImportedItems(data);
+          state.items = clean;
+          persist();
+          renderAll();
+        } catch {
+          alert("无法导入这个文件。");
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    function editItem(id) {
+      const item = state.items.find(entry => entry.id === id);
+      if (!item) return;
+      state.editingId = id;
+      els.titleInput.value = item.title;
+      els.saveBtn.lastChild.textContent = " 校验并更新";
+      setNotice("正在编辑选中的材料。", "");
+      switchPane("add");
+    }
+
+    function deleteItem(id) {
+      state.items = state.items.filter(item => item.id !== id);
+      if (state.currentId === id) state.currentId = null;
+      state.roundIds = state.roundIds.filter(itemId => itemId !== id);
+      if (state.roundIndex >= state.roundIds.length) state.roundIndex = Math.max(0, state.roundIds.length - 1);
+      persist();
+      renderAll();
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    function normalizeEnglishPunctuation(value) {
+      return String(value)
+        .normalize("NFKC")
+        .replace(/[\u201C\u201D\u300C\u300D\u300E\u300F]/g, "\"")
+        .replace(/[\u2018\u2019]/g, "'")
+        .replace(/[。．]/g, ".")
+        .replace(/[，、]/g, ",")
+        .replace(/[？]/g, "?")
+        .replace(/[！]/g, "!")
+        .replace(/[；]/g, ";")
+        .replace(/[：]/g, ":")
+        .replace(/[—–]/g, "-")
+        .replace(/[（]/g, "(")
+        .replace(/[）]/g, ")")
+        .replace(/[【［]/g, "[")
+        .replace(/[】］]/g, "]")
+        .replace(/…/g, "...");
+    }
+
+    [els.titleInput, els.answerInput].forEach(input => {
+      input.addEventListener("input", () => {
+        const normalizedValue = normalizeEnglishPunctuation(input.value);
+        if (input.value !== normalizedValue) {
+          input.value = normalizedValue;
+        }
+        if (!isEnglishOnly(input.value)) {
+          input.value = input.value.replace(/[^\x09\x0A\x0D\x20-\x7E]/g, "");
+          setNotice("已移除非英文字符。", "error");
+        }
+      });
+    });
+
+    els.titleInput.addEventListener("input", () => {
+      if (!state.editingId) setNotice("", "");
+    });
+
+    els.randomBtn.addEventListener("click", startDueRound);
+    els.nextBtn.addEventListener("click", nextItem);
+    els.answerMicBtn.addEventListener("click", () => startVoiceInput(els.answerInput, "result"));
+    els.titleMicBtn.addEventListener("click", () => {
+      els.titleInput.value = "";
+      startVoiceInput(els.titleInput, "notice", els.titleMicBtn, transcript => {
+        const spoken = cleanSpokenTerm(transcript);
+        els.titleInput.value = spoken;
+        els.titleInput.dispatchEvent(new Event("input"));
+        if (!spoken) {
+          setNotice("没有识别到有效英文词条。", "error");
+          return;
+        }
+        setNotice(`已识别到 “${spoken}”。确认无误后，请手动点击“校验并保存”。`, "ok");
+      });
+    });
+    els.checkBtn.addEventListener("click", checkAnswer);
+    els.promptBox.addEventListener("click", event => {
+      const playButton = event.target.closest("button[data-play-current]");
+      if (playButton) {
+        const item = getCurrentItem();
+        if (!item) {
+          setResult("请先开始到期复习。", "bad");
+          return;
+        }
+        if (playButton.dataset.playCurrent === "repeat") {
+          if (repeatPlayback.active && repeatPlayback.button === playButton) {
+            stopRepeatPlayback();
+          } else {
+            startRepeatPlayback(item.title, playButton);
+          }
+        } else {
+          stopRepeatPlayback();
+          speak(item.title, playButton);
+        }
+        return;
+      }
+
+      const revealButton = event.target.closest("button[data-reveal-current]");
+      const skipSentenceButton = event.target.closest("button[data-reveal-skip-sentence]");
+      if (!revealButton && !skipSentenceButton) return;
+      const item = getCurrentItem();
+      if (!item || state.reviewStep !== "spelling") return;
+      if (skipSentenceButton) {
+        completeSkippedSentenceStep(item, "主动展示内容");
+        return;
+      }
+      startSentenceStep(false, "主动展示内容", true);
+    });
+    els.resultBox.addEventListener("click", event => {
+      const finalButton = event.target.closest("button[data-final-judge]");
+      if (finalButton && state.pendingJudgement?.mode === "final") {
+        const item = state.items.find(entry => entry.id === state.pendingJudgement.itemId);
+        if (!item) return;
+        const remembered = finalButton.dataset.finalJudge === "remembered";
+        const sentence = state.pendingJudgement.sentence || "";
+        const spellingAnswer = state.pendingJudgement.spellingAnswer || "";
+        const skippedSentence = Boolean(state.pendingJudgement.skippedSentence);
+        recordReviewResult(item, remembered, remembered ? 100 : 40);
+        setResult(`
+          <strong>${remembered ? "已记为掌握。" : "已标记为需要复习。"}</strong>
+          <p><strong>正确拼写：</strong> ${escapeHtml(item.title)}</p>
+          ${spellingAnswer ? `<p><strong>你的听写：</strong> ${escapeHtml(spellingAnswer)}</p>` : ""}
+          ${skippedSentence ? `<p><strong>造句状态：</strong> 已跳过造句。</p>` : `<p><strong>你的句子：</strong> ${escapeHtml(sentence)}</p>`}
+          <p><strong>累计答对：</strong> ${Number(item.correct || 0)} 次</p>
+          <p><strong>累计复习：</strong> ${Number(item.reviews || 0)} 次</p>
+          <p><strong>下次复习：</strong> ${escapeHtml(formatReviewTime(item.nextReviewAt))}</p>
+          ${getNextRoundAction()}
+        `, remembered ? "good" : "bad");
+        return;
+      }
+
+      const resultNextButton = event.target.closest("button[data-result-next]");
+      if (resultNextButton) {
+        nextItem();
+        return;
+      }
+
+      const spellingButton = event.target.closest("button[data-spelling-action]");
+      if (spellingButton && state.pendingJudgement?.mode === "spelling") {
+        const item = state.items.find(entry => entry.id === state.pendingJudgement.itemId);
+        if (!item) return;
+        if (spellingButton.dataset.spellingAction === "retry") {
+          setResult("好的，不显示答案。你可以再听一次，重新输入后检查。", "");
+          speak(item.title);
+          return;
+        }
+        const submittedAnswer = state.pendingJudgement.answer || "";
+        startSentenceStep(false, submittedAnswer, true);
+        return;
+      }
+
+      const button = event.target.closest("button[data-judge]");
+      if (!button || !state.pendingJudgement) return;
+      const item = state.items.find(entry => entry.id === state.pendingJudgement.itemId);
+      if (!item) return;
+      const remembered = button.dataset.judge === "correct";
+      const definition = state.pendingJudgement.definition || "";
+      recordReviewResult(item, remembered, state.pendingJudgement.score);
+      setResult(`
+        <strong>${remembered ? "已记为正确。" : "已记为错误，需要再复习。"}</strong>
+        <p><strong>词典释义：</strong> ${escapeHtml(definition).replace(/\n/g, "<br>")}</p>
+        <p><strong>累计答对：</strong> ${Number(item.correct || 0)} 次</p>
+        <p><strong>下次复习：</strong> ${escapeHtml(formatReviewTime(item.nextReviewAt))}</p>
+        ${getNextRoundAction()}
+      `, remembered ? "good" : "bad");
+    });
+    els.saveBtn.addEventListener("click", saveItem);
+    els.notifyBtn.addEventListener("click", async () => {
+      if (!("Notification" in window)) {
+        setNotice("当前浏览器不支持桌面提醒。", "error");
+        return;
+      }
+      const permission = await Notification.requestPermission();
+      if (permission === "granted") {
+        setNotice("复习提醒已开启。页面打开时，到期内容会提醒你。", "ok");
+        maybeNotifyDueItems();
+      } else {
+        setNotice("提醒权限没有开启。你仍然可以手动点击“到期复习”。", "error");
+      }
+    });
+    els.addTab.addEventListener("click", () => switchPane("add"));
+    els.libraryTab.addEventListener("click", () => {
+      state.libraryFilter = "all";
+      renderList();
+      switchPane("library");
+    });
+    els.statFilterButtons.forEach(button => {
+      button.addEventListener("click", () => {
+        state.libraryFilter = button.dataset.libraryFilter || "all";
+        els.librarySearchInput.value = "";
+        switchPane("library");
+        renderList();
+      });
+    });
+    els.librarySearchInput.addEventListener("input", renderList);
+    els.exportBtn.addEventListener("click", exportItems);
+    els.importBtn.addEventListener("click", () => els.importFile.click());
+    els.importFile.addEventListener("change", event => {
+      const file = event.target.files[0];
+      if (file) importItems(file);
+      event.target.value = "";
+    });
+    els.voiceSelect.addEventListener("change", () => {
+      state.settings.voiceName = els.voiceSelect.value;
+      const selectedIndex = state.voices.findIndex(voice => voice.name === els.voiceSelect.value);
+      state.nextSpeechVoiceIndex = selectedIndex >= 0 ? selectedIndex : 0;
+      state.lastSpeechVoiceName = "";
+      persistSettings();
+    });
+    els.rateSelect.addEventListener("change", () => {
+      state.settings.rate = els.rateSelect.value;
+      persistSettings();
+    });
+    els.clearBtn.addEventListener("click", () => {
+      if (confirm("确定清空所有已保存的英文材料吗？")) {
+        state.items = [];
+        state.currentId = null;
+        state.roundIds = [];
+        state.roundIndex = 0;
+        persist();
+        renderAll();
+      }
+    });
+    els.itemList.addEventListener("click", event => {
+      const button = event.target.closest("button[data-action]");
+      if (!button) return;
+      const id = button.dataset.id;
+      if (button.dataset.action === "play") {
+        const item = state.items.find(entry => entry.id === id);
+        if (item) speak(item.title, button);
+      }
+      if (button.dataset.action === "edit") editItem(id);
+      if (button.dataset.action === "delete") deleteItem(id);
+    });
+
+    async function initialize() {
+      load();
+      await loadTtsStatus();
+      renderVoices();
+      const loadedShared = await loadSharedItems();
+      if (!loadedShared) await restoreFromExportIfEmpty();
+      renderAll();
+      maybeNotifyDueItems();
+    }
+
+    initialize();
+    setInterval(() => {
+      renderStats();
+      renderList();
+      maybeNotifyDueItems();
+    }, 60000);
+    setInterval(refreshSharedItems, 5000);
+    if ("speechSynthesis" in window) {
+      window.speechSynthesis.onvoiceschanged = renderVoices;
+    }
+  </script>
+</body>
+</html>
+
+

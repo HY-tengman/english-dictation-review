@@ -1,0 +1,8 @@
+node_modules/
+.env
+.DS_Store
+data/tts.env
+data/tts-cache/
+data/library.json
+tools/
+*.log

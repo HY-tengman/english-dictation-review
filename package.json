@@ -1,0 +1,13 @@
+{
+  "name": "english-dictation-review-shared",
+  "version": "1.0.0",
+  "private": true,
+  "license": "MIT",
+  "description": "Shared English dictation review app with server-side JSON storage.",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
