@@ -594,7 +594,7 @@ async function handleApi(request, response) {
     sendJson(response, 200, {
       ok: true,
       count: items.length,
-      updatedAt: new Date().toISOString(),
+      updatedAt: fs.statSync(libraryFile).mtime.toISOString(),
     });
     return true;
   }
